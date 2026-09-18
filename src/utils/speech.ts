@@ -27,7 +27,7 @@ export const speakText = (text: string, rate: number = 0.9, lang: string = 'en-U
 export const getPhoneticInfo = (
   word: WordItem,
   speechLang: string = 'en-US'
-): { label: string; flag: string; phonetic: string; altLabel?: string; altPhonetic?: string } => {
+): { label: string; flag: string; countryCode: string; phonetic: string; altLabel?: string; altPhonetic?: string; altCountryCode?: string } => {
   const isUk = speechLang === 'en-GB';
   const isAu = speechLang === 'en-AU';
   const wantsUk = isUk || isAu;
@@ -36,18 +36,22 @@ export const getPhoneticInfo = (
     return {
       label: isAu ? 'AU/UK' : 'UK',
       flag: isAu ? '🇦🇺' : '🇬🇧',
+      countryCode: isAu ? 'AU' : 'GB',
       phonetic: word.phoneticUk || word.phonetic,
       altLabel: 'US',
       altPhonetic: word.phonetic,
+      altCountryCode: 'US',
     };
   }
 
   return {
     label: 'US',
     flag: '🇺🇸',
+    countryCode: 'US',
     phonetic: word.phonetic,
     altLabel: word.phoneticUk ? 'UK' : undefined,
     altPhonetic: word.phoneticUk,
+    altCountryCode: word.phoneticUk ? 'GB' : undefined,
   };
 };
 

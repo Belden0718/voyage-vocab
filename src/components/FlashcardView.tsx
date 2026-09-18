@@ -5,6 +5,7 @@ import {
   Volume2, Star, RotateCw, ArrowLeft, ArrowRight, Lightbulb 
 } from 'lucide-react';
 import { speakText, triggerHaptic, getPhoneticInfo } from '../utils/speech';
+import { CountryFlag } from './CountryFlag';
 
 interface FlashcardViewProps {
   words: WordItem[];
@@ -259,8 +260,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 <span className="text-[11px] font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded shadow-2xs">
                   {currentWord?.partOfSpeech}
                 </span>
-                <span className="text-[11px] font-bold text-slate-600 flex items-center gap-0.5">
-                  <span>{currentWord ? getPhoneticInfo(currentWord, settings.speechLang).flag : '🇺🇸'}</span>
+                <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
+                  <CountryFlag code={currentWord ? getPhoneticInfo(currentWord, settings.speechLang).countryCode : 'US'} />
                   <span>{currentWord ? getPhoneticInfo(currentWord, settings.speechLang).label : 'US'}</span>
                 </span>
                 <span className="text-xs text-slate-700 font-mono tracking-wide">
@@ -312,9 +313,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               </h3>
               {currentWord?.phoneticUk && (
                 <div className="flex items-center gap-2 mt-1 text-[11px] font-mono">
-                  <span className="text-slate-400">🇺🇸 {currentWord.phonetic}</span>
+                  <span className="inline-flex items-center gap-1 text-slate-400">
+                    <CountryFlag code="US" className="w-3.5 h-2.5 inline-block rounded-[1px] shadow-2xs border border-white/20 align-middle shrink-0" />
+                    <span>{currentWord.phonetic}</span>
+                  </span>
                   <span className="text-white/20">•</span>
-                  <span className="text-sky-300">🇬🇧/🇦🇺 {currentWord.phoneticUk}</span>
+                  <span className="inline-flex items-center gap-1 text-sky-300">
+                    <CountryFlag code="GB" className="w-3.5 h-2.5 inline-block rounded-[1px] shadow-2xs border border-white/20 align-middle shrink-0" />
+                    <span>{currentWord.phoneticUk}</span>
+                  </span>
                 </div>
               )}
             </div>

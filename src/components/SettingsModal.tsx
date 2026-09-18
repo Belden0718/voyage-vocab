@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { AppSettings } from '../utils/storage';
 import { speakText, triggerHaptic } from '../utils/speech';
+import { CountryFlag } from './CountryFlag';
 import { isFirebaseConfigured, saveCustomFirebaseConfig } from '../services/firebase';
 import { loginWithGoogle, logoutFirebase } from '../services/syncService';
 import type { User } from 'firebase/auth';
@@ -250,9 +251,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { code: 'en-US', label: '美式口音 🇺🇸' },
-                { code: 'en-GB', label: '英式口音 🇬🇧' },
-                { code: 'en-AU', label: '澳洲口音 🇦🇺' },
+                { code: 'en-US', label: '美式口音', country: 'US' },
+                { code: 'en-GB', label: '英式口音', country: 'GB' },
+                { code: 'en-AU', label: '澳洲口音', country: 'AU' },
               ].map(voice => (
                 <button
                   key={voice.code}
@@ -261,13 +262,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onUpdateSettings({ speechLang: voice.code });
                     testVoice(voice.code, settings.speechRate);
                   }}
-                  className={`py-2 px-1 text-center rounded-xl text-xs font-bold border transition-all ${
+                  className={`py-2 px-1 text-center rounded-xl text-xs font-bold border transition-all flex flex-col items-center justify-center gap-1.5 ${
                     settings.speechLang === voice.code
                       ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  {voice.label}
+                  <CountryFlag code={voice.country} className="w-5 h-3.5 inline-block rounded-[2px] shadow-2xs border border-white/20 align-middle shrink-0" />
+                  <span>{voice.label}</span>
                 </button>
               ))}
             </div>

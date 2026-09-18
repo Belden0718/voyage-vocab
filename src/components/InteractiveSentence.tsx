@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import type { WordItem } from '../types';
 import { speakText, triggerHaptic } from '../utils/speech';
 import { saveCustomWord } from '../utils/storage';
-import { Volume2, ExternalLink, X, BookOpen, Plus, Check, Layers } from 'lucide-react';
+import { Volume2, ExternalLink, X, BookOpen, Plus, Check } from 'lucide-react';
 
 interface InteractiveSentenceProps {
   sentence: string;
@@ -94,24 +94,72 @@ const PHRASAL_VERBS_MAP: Record<string, { base: string; pos: string; trans: stri
   'due to': { base: 'due to', pos: 'prep phr.', trans: '由於、因為 (常用於說明原因)', explanation: 'Due to bad weather / delay', phonetic: '/du: tu:/' },
 };
 
-// 常見高頻基礎詞速查表
+// 常見高頻基礎詞速查表 (涵蓋基礎名詞、代名詞、介系詞、連詞與常用形容詞)
 const BASIC_COMMON_WORDS: Record<string, { pos: string; trans: string; phonetic?: string }> = {
+  // 連接詞與副詞
   'and': { pos: 'conj.', trans: '和、與、而且', phonetic: '/ænd/' },
   'or': { pos: 'conj.', trans: '或者、還是', phonetic: '/ɔ:r/' },
   'but': { pos: 'conj.', trans: '但是、然而', phonetic: '/bʌt/' },
   'so': { pos: 'conj./adv.', trans: '所以、如此', phonetic: '/soʊ/' },
+  'also': { pos: 'adv.', trans: '也、並且', phonetic: '/ˈɔ:lsoʊ/' },
+  'then': { pos: 'adv.', trans: '然後、當時', phonetic: '/ðen/' },
+  'actually': { pos: 'adv.', trans: '實際上、居然、竟然', phonetic: '/ˈæktʃuəli/' },
   'please': { pos: 'adv./v.', trans: '請、拜託；使滿意', phonetic: '/pli:z/' },
-  'have': { pos: 'v.', trans: '有、具備；讓、使得', phonetic: '/hæv/' },
-  'has': { pos: 'v.', trans: '有 (第三人稱單數)', phonetic: '/hæz/' },
-  'had': { pos: 'v.', trans: '有 (過去式/過去分詞)', phonetic: '/hæd/' },
-  'your': { pos: 'pron.', trans: '你的、你們的 (所有格)', phonetic: '/jɔ:r/' },
+  'not': { pos: 'adv.', trans: '不、沒有', phonetic: '/nɑ:t/' },
+  'no': { pos: 'adj./adv.', trans: '沒有、不', phonetic: '/noʊ/' },
+  'yes': { pos: 'adv.', trans: '是的', phonetic: '/jes/' },
+  'ok': { pos: 'adj./adv.', trans: '好的、沒問題', phonetic: '/oʊˈkeɪ/' },
+  'okay': { pos: 'adj./adv.', trans: '好的、可以', phonetic: '/oʊˈkeɪ/' },
+  'just': { pos: 'adv.', trans: '只是、正好、剛剛', phonetic: '/dʒʌst/' },
+  'too': { pos: 'adv.', trans: '太、過於；也', phonetic: '/tu:/' },
+  'very': { pos: 'adv.', trans: '非常、很', phonetic: '/ˈveri/' },
+  'really': { pos: 'adv.', trans: '真地、確實', phonetic: '/ˈri:əli/' },
+  'together': { pos: 'adv.', trans: '一起、共同', phonetic: '/təˈɡeðər/' },
+  'here': { pos: 'adv.', trans: '在這裡、往這裡', phonetic: '/hɪr/' },
+  'there': { pos: 'adv.', trans: '在那裡、往那裡', phonetic: '/ðer/' },
+  'now': { pos: 'adv.', trans: '現在、立刻', phonetic: '/naʊ/' },
+  'today': { pos: 'n./adv.', trans: '今天', phonetic: '/təˈdeɪ/' },
+  'tomorrow': { pos: 'n./adv.', trans: '明天', phonetic: '/təˈmɔ:roʊ/' },
+  'yesterday': { pos: 'n./adv.', trans: '昨天', phonetic: '/ˈjestərdeɪ/' },
+  'again': { pos: 'adv.', trans: '再次、又一次', phonetic: '/əˈɡen/' },
+  'already': { pos: 'adv.', trans: '已經', phonetic: '/ɔ:lˈredi/' },
+  'always': { pos: 'adv.', trans: '總是、一直', phonetic: '/ˈɔ:lweɪz/' },
+  'never': { pos: 'adv.', trans: '從不、絕不', phonetic: '/ˈnevər/' },
+
+  // 代名詞
+  'i': { pos: 'pron.', trans: '我 (主格)', phonetic: '/aɪ/' },
   'you': { pos: 'pron.', trans: '你、你們', phonetic: '/ju:/' },
-  'my': { pos: 'pron.', trans: '我的', phonetic: '/maɪ/' },
+  'your': { pos: 'pron.', trans: '你的、你們的 (所有格)', phonetic: '/jɔ:r/' },
+  'my': { pos: 'pron.', trans: '我的 (所有格)', phonetic: '/maɪ/' },
   'me': { pos: 'pron.', trans: '我 (受格)', phonetic: '/mi:/' },
-  'we': { pos: 'pron.', trans: '我們', phonetic: '/wi:/' },
-  'our': { pos: 'pron.', trans: '我們的', phonetic: '/ˈaʊər/' },
+  'he': { pos: 'pron.', trans: '他 (主格)', phonetic: '/hi:/' },
+  'him': { pos: 'pron.', trans: '他 (受格)', phonetic: '/hɪm/' },
+  'his': { pos: 'pron.', trans: '他的 (所有格)', phonetic: '/hɪz/' },
+  'she': { pos: 'pron.', trans: '她 (主格)', phonetic: '/ʃi:/' },
+  'her': { pos: 'pron.', trans: '她的 (所有格/受格)', phonetic: '/hɜ:r/' },
+  'it': { pos: 'pron.', trans: '它 (主格/受格)', phonetic: '/ɪt/' },
+  'its': { pos: 'pron.', trans: '它的 (所有格)', phonetic: '/ɪts/' },
+  'we': { pos: 'pron.', trans: '我們 (主格)', phonetic: '/wi:/' },
+  'our': { pos: 'pron.', trans: '我們的 (所有格)', phonetic: '/ˈaʊər/' },
   'us': { pos: 'pron.', trans: '我們 (受格)', phonetic: '/ʌs/' },
-  'ready': { pos: 'adj.', trans: '準備好的、現成的', phonetic: '/ˈredi/' },
+  'they': { pos: 'pron.', trans: '他們 (主格)', phonetic: '/ðeɪ/' },
+  'them': { pos: 'pron.', trans: '他們 (受格)', phonetic: '/ðem/' },
+  'their': { pos: 'pron.', trans: '他們的 (所有格)', phonetic: '/ðer/' },
+  'this': { pos: 'pron./adj.', trans: '這個', phonetic: '/ðɪs/' },
+  'that': { pos: 'pron./conj.', trans: '那個；連接詞 (引導子句)', phonetic: '/ðæt/' },
+  'these': { pos: 'pron./adj.', trans: '這些', phonetic: '/ði:z/' },
+  'those': { pos: 'pron./adj.', trans: '那些', phonetic: '/ðoʊz/' },
+  'what': { pos: 'pron.', trans: '什麼', phonetic: '/wɑ:t/' },
+  'where': { pos: 'pron./adv.', trans: '哪裡', phonetic: '/wer/' },
+  'when': { pos: 'adv./conj.', trans: '何時、當...的時候', phonetic: '/wen/' },
+  'how': { pos: 'adv.', trans: '如何、怎樣', phonetic: '/haʊ/' },
+  'who': { pos: 'pron.', trans: '誰', phonetic: '/hu:/' },
+  'which': { pos: 'pron./adj.', trans: '哪一個', phonetic: '/wɪtʃ/' },
+
+  // 冠詞與介系詞
+  'the': { pos: 'art.', trans: '這/那 (定冠詞)', phonetic: '/ði:/' },
+  'a': { pos: 'art.', trans: '一個 (不定冠詞)', phonetic: '/eɪ/' },
+  'an': { pos: 'art.', trans: '一個 (母音前不定冠詞)', phonetic: '/æn/' },
   'at': { pos: 'prep.', trans: '在 (特定地點/時刻)', phonetic: '/æt/' },
   'in': { pos: 'prep.', trans: '在...裡面、在 (區域/時間)', phonetic: '/ɪn/' },
   'on': { pos: 'prep.', trans: '在...上面、在 (某日)', phonetic: '/ɑ:n/' },
@@ -119,32 +167,136 @@ const BASIC_COMMON_WORDS: Record<string, { pos: string; trans: string; phonetic?
   'for': { pos: 'prep.', trans: '為了、給、持續 (時間)', phonetic: '/fɔ:r/' },
   'of': { pos: 'prep.', trans: '...的、屬於、關於', phonetic: '/ʌv/' },
   'with': { pos: 'prep.', trans: '和...一起、用、具有', phonetic: '/wɪð/' },
+  'without': { pos: 'prep.', trans: '沒有、無', phonetic: '/wɪˈðaʊt/' },
   'by': { pos: 'prep.', trans: '藉由、在...旁邊、被', phonetic: '/baɪ/' },
-  'the': { pos: 'art.', trans: '這/那 (定冠詞)', phonetic: '/ði:/' },
-  'a': { pos: 'art.', trans: '一個 (不定冠詞)', phonetic: '/eɪ/' },
-  'an': { pos: 'art.', trans: '一個 (母音開頭前)', phonetic: '/æn/' },
+  'from': { pos: 'prep.', trans: '來自、從', phonetic: '/frʌm/' },
+  'about': { pos: 'prep./adv.', trans: '關於；大約', phonetic: '/əˈbaʊt/' },
+  'into': { pos: 'prep.', trans: '進入...之中', phonetic: '/ˈɪntu:/' },
+  'out': { pos: 'adv./prep.', trans: '在外面、出來、離開', phonetic: '/aʊt/' },
+  'up': { pos: 'adv./prep.', trans: '向上、起來', phonetic: '/ʌp/' },
+  'down': { pos: 'adv./prep.', trans: '向下、落下', phonetic: '/daʊn/' },
+  'off': { pos: 'adv./prep.', trans: '離開、脫下、關掉', phonetic: '/ɔ:f/' },
+
+  // 動詞 (be、助動詞與常用動詞)
   'is': { pos: 'v.', trans: '是 (be動詞單數現在式)', phonetic: '/ɪz/' },
   'are': { pos: 'v.', trans: '是 (be動詞複數現在式)', phonetic: '/ɑ:r/' },
   'was': { pos: 'v.', trans: '是 (be動詞單數過去式)', phonetic: '/wʌz/' },
   'were': { pos: 'v.', trans: '是 (be動詞複數過去式)', phonetic: '/wɜ:r/' },
   'be': { pos: 'v.', trans: '是、存在、成為 (原型)', phonetic: '/bi:/' },
+  'been': { pos: 'v.', trans: '是、到過 (過去分詞)', phonetic: '/bɪn/' },
+  'being': { pos: 'v.', trans: '正在處於 (進行式)', phonetic: '/ˈbi:ɪŋ/' },
+  'have': { pos: 'v.', trans: '有、具備；讓、使得', phonetic: '/hæv/' },
+  'has': { pos: 'v.', trans: '有 (第三人稱單數)', phonetic: '/hæz/' },
+  'had': { pos: 'v.', trans: '有 (過去式/過去分詞)', phonetic: '/hæd/' },
+  'do': { pos: 'v./aux.', trans: '做、執行；助動詞', phonetic: '/du:/' },
+  'does': { pos: 'v./aux.', trans: '做 (第三人稱單數)', phonetic: '/dʌz/' },
+  'did': { pos: 'v./aux.', trans: '做 (過去式)', phonetic: '/dɪd/' },
   'can': { pos: 'modal', trans: '能夠、可以', phonetic: '/kæn/' },
   'could': { pos: 'modal', trans: '能夠、可以 (禮貌請求)', phonetic: '/kʊd/' },
   'would': { pos: 'modal', trans: '將會、願意 (委婉客氣)', phonetic: '/wʊd/' },
   'will': { pos: 'modal', trans: '將會、願意', phonetic: '/wɪl/' },
   'should': { pos: 'modal', trans: '應該', phonetic: '/ʃʊd/' },
   'may': { pos: 'modal', trans: '也許、可以 (許可)', phonetic: '/meɪ/' },
+  'might': { pos: 'modal', trans: '可能、也許', phonetic: '/maɪt/' },
   'must': { pos: 'modal', trans: '必須、一定', phonetic: '/mʌst/' },
-  'not': { pos: 'adv.', trans: '不、沒有', phonetic: '/nɑ:t/' },
-  'no': { pos: 'adj./adv.', trans: '沒有、不', phonetic: '/noʊ/' },
   'turn': { pos: 'v./n.', trans: '轉動、轉向；輪流', phonetic: '/tɜ:rn/' },
   'turned': { pos: 'v.', trans: '轉向、轉動 (過去式)', phonetic: '/tɜ:rnd/' },
-  'out': { pos: 'adv./prep.', trans: '在外面、出來、離開', phonetic: '/aʊt/' },
-  'that': { pos: 'pron./conj.', trans: '那個；連接詞 (引導名詞子句)', phonetic: '/ðæt/' },
+  'prefer': { pos: 'v.', trans: '更喜歡、偏好', phonetic: '/prɪˈfɜ:r/' },
+  'preferred': { pos: 'v.', trans: '更喜歡 (過去式)', phonetic: '/prɪˈfɜ:rd/' },
+  'like': { pos: 'v./prep.', trans: '喜歡；像、如同', phonetic: '/laɪk/' },
+  'want': { pos: 'v.', trans: '想要', phonetic: '/wɑ:nt/' },
+  'wanted': { pos: 'v.', trans: '想要 (過去式)', phonetic: '/ˈwɑ:ntɪd/' },
+  'need': { pos: 'v./n.', trans: '需要', phonetic: '/ni:d/' },
+  'needed': { pos: 'v.', trans: '需要 (過去式)', phonetic: '/ˈni:dɪd/' },
+  'help': { pos: 'v./n.', trans: '幫助、協助', phonetic: '/help/' },
+  'helped': { pos: 'v.', trans: '幫助 (過去式)', phonetic: '/helpt/' },
   'share': { pos: 'v./n.', trans: '分享、共有；股份', phonetic: '/ʃer/' },
-  'college': { pos: 'n.', trans: '大學、學院', phonetic: '/ˈkɑ:lɪdʒ/' },
+  'shared': { pos: 'v.', trans: '分享 (過去式)', phonetic: '/ʃerd/' },
+  'take': { pos: 'v.', trans: '拿取、搭乘、花費', phonetic: '/teɪk/' },
+  'took': { pos: 'v.', trans: '拿取、搭乘 (過去式)', phonetic: '/tʊk/' },
+  'get': { pos: 'v.', trans: '得到、前往、變得', phonetic: '/ɡet/' },
+  'got': { pos: 'v.', trans: '得到 (過去式)', phonetic: '/ɡɑ:t/' },
+  'go': { pos: 'v.', trans: '去、前往', phonetic: '/ɡoʊ/' },
+  'went': { pos: 'v.', trans: '去 (過去式)', phonetic: '/went/' },
+  'come': { pos: 'v.', trans: '來、抵達', phonetic: '/kʌm/' },
+  'came': { pos: 'v.', trans: '來 (過去式)', phonetic: '/keɪm/' },
+  'see': { pos: 'v.', trans: '看見、明白', phonetic: '/si:/' },
+  'saw': { pos: 'v.', trans: '看見 (過去式)', phonetic: '/sɔ:/' },
+  'know': { pos: 'v.', trans: '知道、認識', phonetic: '/noʊ/' },
+  'knew': { pos: 'v.', trans: '知道 (過去式)', phonetic: '/nu:/' },
+  'say': { pos: 'v.', trans: '說', phonetic: '/seɪ/' },
+  'said': { pos: 'v.', trans: '說 (過去式)', phonetic: '/sed/' },
+  'tell': { pos: 'v.', trans: '告訴、講述', phonetic: '/tel/' },
+  'told': { pos: 'v.', trans: '告訴 (過去式)', phonetic: '/toʊld/' },
+  'call': { pos: 'v./n.', trans: '打電話、呼叫；電話', phonetic: '/kɔ:l/' },
+  'pay': { pos: 'v./n.', trans: '付款、支付', phonetic: '/peɪ/' },
+  'paid': { pos: 'v.', trans: '付款 (過去式)', phonetic: '/peɪd/' },
+  'check': { pos: 'v./n.', trans: '檢查、核對；帳單', phonetic: '/tʃek/' },
+  'order': { pos: 'v./n.', trans: '點餐、訂購；順序', phonetic: '/ˈɔ:rdər/' },
+  'book': { pos: 'v./n.', trans: '預訂；書本', phonetic: '/bʊk/' },
+  'booked': { pos: 'v.', trans: '預訂 (過去式)', phonetic: '/bʊkt/' },
+
+  // 名詞與形容詞 (日常旅遊與生活高頻詞)
+  'water': { pos: 'n.', trans: '水、飲用水；給...澆水', phonetic: '/ˈwɔ:tər/' },
+  'still': { pos: 'adj./adv.', trans: '無氣泡的、平靜的；仍然', phonetic: '/stɪl/' },
+  'sparkling': { pos: 'adj.', trans: '起泡的、閃閃發光的', phonetic: '/ˈspɑ:rklɪŋ/' },
+  'lemon': { pos: 'n.', trans: '檸檬', phonetic: '/ˈlemən/' },
+  'tea': { pos: 'n.', trans: '茶', phonetic: '/ti:/' },
+  'coffee': { pos: 'n.', trans: '咖啡', phonetic: '/ˈkɔ:fi/' },
+  'beer': { pos: 'n.', trans: '啤酒', phonetic: '/bɪr/' },
+  'wine': { pos: 'n.', trans: '葡萄酒、紅酒', phonetic: '/waɪn/' },
+  'drink': { pos: 'n./v.', trans: '飲料；喝', phonetic: '/drɪŋk/' },
+  'food': { pos: 'n.', trans: '食物、餐點', phonetic: '/fu:d/' },
+  'menu': { pos: 'n.', trans: '菜單', phonetic: '/ˈmenju:/' },
+  'table': { pos: 'n.', trans: '餐桌、桌子', phonetic: '/ˈteɪbl/' },
+  'bill': { pos: 'n.', trans: '帳單、鈔票', phonetic: '/bɪl/' },
+  'tip': { pos: 'n./v.', trans: '小費；實用建議、訣竅', phonetic: '/tɪp/' },
+  'price': { pos: 'n.', trans: '價格、價錢', phonetic: '/praɪs/' },
+  'cash': { pos: 'n.', trans: '現金', phonetic: '/kæʃ/' },
+  'card': { pos: 'n.', trans: '卡片、票卡', phonetic: '/kɑ:rd/' },
+  'pass': { pos: 'n./v.', trans: '通行證、票券；通過', phonetic: '/pæs/' },
+  'boarding': { pos: 'n./adj.', trans: '登機、登船', phonetic: '/ˈbɔ:rdɪŋ/' },
+  'ticket': { pos: 'n.', trans: '票券、車票、門票', phonetic: '/ˈtɪkɪt/' },
+  'flight': { pos: 'n.', trans: '班機、航程', phonetic: '/flaɪt/' },
+  'gate': { pos: 'n.', trans: '登機門、大門', phonetic: '/ɡeɪt/' },
+  'seat': { pos: 'n.', trans: '座位', phonetic: '/si:t/' },
+  'bag': { pos: 'n.', trans: '提袋、袋子', phonetic: '/bæɡ/' },
+  'luggage': { pos: 'n.', trans: '行李', phonetic: '/ˈlʌɡɪdʒ/' },
+  'baggage': { pos: 'n.', trans: '行李', phonetic: '/ˈbæɡɪdʒ/' },
+  'airport': { pos: 'n.', trans: '機場', phonetic: '/ˈerpɔ:rt/' },
+  'station': { pos: 'n.', trans: '車站、局', phonetic: '/ˈsteɪʃn/' },
+  'bus': { pos: 'n.', trans: '公車、巴士', phonetic: '/bʌs/' },
+  'train': { pos: 'n./v.', trans: '火車；訓練', phonetic: '/treɪn/' },
+  'car': { pos: 'n.', trans: '汽車', phonetic: '/kɑ:r/' },
+  'taxi': { pos: 'n.', trans: '計程車', phonetic: '/ˈtæksi/' },
+  'hotel': { pos: 'n.', trans: '飯店、旅館', phonetic: '/hoʊˈtel/' },
+  'room': { pos: 'n.', trans: '房間、空間', phonetic: '/ru:m/' },
+  'key': { pos: 'n./adj.', trans: '鑰匙；關鍵', phonetic: '/ki:/' },
+  'desk': { pos: 'n.', trans: '櫃檯、書桌', phonetic: '/desk/' },
+  'service': { pos: 'n.', trans: '服務', phonetic: '/ˈsɜ:rvɪs/' },
+  'friend': { pos: 'n.', trans: '朋友', phonetic: '/frend/' },
+  'friends': { pos: 'n.', trans: '朋友們 (複數)', phonetic: '/frendz/' },
+  'mutual': { pos: 'adj.', trans: '共同的、互相的', phonetic: '/ˈmju:tʃuəl/' },
+  'time': { pos: 'n.', trans: '時間、次數', phonetic: '/taɪm/' },
+  'hour': { pos: 'n.', trans: '小時', phonetic: '/ˈaʊər/' },
+  'day': { pos: 'n.', trans: '白天、一天', phonetic: '/deɪ/' },
   'days': { pos: 'n.', trans: '歲月、時代、日子 (複數)', phonetic: '/deɪz/' },
-  'actually': { pos: 'adv.', trans: '實際上、居然、竟然', phonetic: '/ˈæktʃuəli/' },
+  'college': { pos: 'n.', trans: '大學、學院', phonetic: '/ˈkɑ:lɪdʒ/' },
+  'good': { pos: 'adj.', trans: '好的、優良的', phonetic: '/ɡʊd/' },
+  'great': { pos: 'adj.', trans: '極好的、偉大的', phonetic: '/ɡreɪt/' },
+  'fine': { pos: 'adj.', trans: '好的、健康的', phonetic: '/faɪn/' },
+  'well': { pos: 'adv./adj.', trans: '很好地；健康', phonetic: '/wel/' },
+  'free': { pos: 'adj.', trans: '免費的、自由的', phonetic: '/fri:/' },
+  'ready': { pos: 'adj.', trans: '準備好的、現成的', phonetic: '/ˈredi/' },
+  'open': { pos: 'adj./v.', trans: '營業中的；打開', phonetic: '/ˈoʊpən/' },
+  'closed': { pos: 'adj.', trans: '已打烊的、關閉的', phonetic: '/kloʊzd/' },
+  'hot': { pos: 'adj.', trans: '熱的、辣的', phonetic: '/hɑ:t/' },
+  'cold': { pos: 'adj.', trans: '冰冷的、冷的', phonetic: '/koʊld/' },
+  'ice': { pos: 'n.', trans: '冰塊、冰', phonetic: '/aɪs/' },
+  'big': { pos: 'adj.', trans: '大的', phonetic: '/bɪɡ/' },
+  'small': { pos: 'adj.', trans: '小的', phonetic: '/smɔ:l/' },
+  'fast': { pos: 'adj./adv.', trans: '快速的', phonetic: '/fæst/' },
+  'slow': { pos: 'adj./adv.', trans: '緩慢的', phonetic: '/sloʊ/' },
 };
 
 interface LookupResult {
@@ -157,105 +309,36 @@ interface LookupResult {
   source: 'phrasal' | 'vocab' | 'common' | 'online';
 }
 
-// 智慧語境查詞：支援動詞片語識別、本機詞庫、常見字與線上辭典
-const lookupWordInContext = (
-  clean: string,
-  fullSentence: string,
-  pool: WordItem[],
-  adjacentCandidates: string[] = []
-): { primary: LookupResult; singleWordFallback?: LookupResult } => {
-  if (!clean) {
-    return { primary: { word: clean, translation: '', source: 'online' } };
-  }
+// 單字獨立精確查詞
+const lookupSingleWord = (clean: string, pool: WordItem[]): LookupResult => {
+  if (!clean) return { word: clean, translation: '', source: 'online' };
 
-  // 1. 最優先：檢查相鄰單字是否構成常見動詞片語 (例如 turned + out -> turned out)
-  for (const cand of adjacentCandidates) {
-    if (PHRASAL_VERBS_MAP[cand]) {
-      const ph = PHRASAL_VERBS_MAP[cand];
-      const phrasalResult: LookupResult = {
-        word: cand,
-        baseWord: ph.base,
-        phonetic: ph.phonetic,
-        partOfSpeech: ph.pos,
-        translation: ph.trans,
-        tip: ph.explanation,
-        source: 'phrasal',
-      };
-
-      // 同時準備單字本身的獨立查詢 (方便使用者切換查看單字原意)
-      const singleBasic = BASIC_COMMON_WORDS[clean];
-      const singleWordFallback: LookupResult = singleBasic ? {
-        word: clean,
-        phonetic: singleBasic.phonetic,
-        partOfSpeech: singleBasic.pos,
-        translation: singleBasic.trans,
-        source: 'common'
-      } : {
-        word: clean,
-        translation: '',
-        source: 'online'
-      };
-
-      return { primary: phrasalResult, singleWordFallback };
-    }
-  }
-
-  // 2. 檢查：當前句子是否「完整包含」詞庫中某個多詞單字 (例如 "boarding pass")
-  const lowerSentence = fullSentence.toLowerCase();
-  const matchedPhrase = pool.find(w => {
-    const wLower = w.word.toLowerCase();
-    if (wLower.includes(' ')) {
-      if (lowerSentence.includes(wLower)) {
-        const parts = wLower.split(/\s+/);
-        return parts.includes(clean);
-      }
-    }
-    return false;
-  });
-
-  if (matchedPhrase) {
-    return {
-      primary: {
-        word: matchedPhrase.word,
-        phonetic: matchedPhrase.phonetic,
-        partOfSpeech: matchedPhrase.partOfSpeech,
-        translation: matchedPhrase.translation,
-        tip: matchedPhrase.tip,
-        source: 'vocab',
-      }
-    };
-  }
-
-  // 3. 本機 310 詞庫全字匹配
+  // 1. 本機 310 核心詞庫精確匹配
   const exact = pool.find(w => w.word.toLowerCase() === clean);
   if (exact) {
     return {
-      primary: {
-        word: exact.word,
-        phonetic: exact.phonetic,
-        partOfSpeech: exact.partOfSpeech,
-        translation: exact.translation,
-        tip: exact.tip,
-        source: 'vocab',
-      }
+      word: exact.word,
+      phonetic: exact.phonetic,
+      partOfSpeech: exact.partOfSpeech,
+      translation: exact.translation,
+      tip: exact.tip,
+      source: 'vocab',
     };
   }
 
-  // 4. 常見高頻功能詞、連詞、介系詞字典
-  if (BASIC_COMMON_WORDS[clean]) {
-    const basic = BASIC_COMMON_WORDS[clean];
+  // 2. 常用高頻字速查表 (如 water, pass, still, friend...)
+  const basic = BASIC_COMMON_WORDS[clean];
+  if (basic) {
     return {
-      primary: {
-        word: clean,
-        phonetic: basic.phonetic,
-        partOfSpeech: basic.pos,
-        translation: basic.trans,
-        source: 'common',
-      }
+      word: clean,
+      phonetic: basic.phonetic,
+      partOfSpeech: basic.pos,
+      translation: basic.trans,
+      source: 'common',
     };
   }
 
-  // 5. 詞形變化還原 (單複數 -s/-es, 過去式 -ed, 進行式 -ing)
+  // 3. 詞形變化還原 (單複數 -s/-es, 過去式 -ed, 進行式 -ing)
   let stemMatch: WordItem | undefined;
   if (clean.endsWith('es')) {
     stemMatch = pool.find(w => w.word.toLowerCase() === clean.slice(0, -2));
@@ -269,26 +352,29 @@ const lookupWordInContext = (
 
   if (stemMatch) {
     return {
-      primary: {
-        word: clean,
-        phonetic: stemMatch.phonetic,
-        partOfSpeech: stemMatch.partOfSpeech,
-        translation: `${stemMatch.translation} (${stemMatch.word} 的變化型)`,
-        tip: stemMatch.tip,
-        source: 'vocab',
-      }
+      word: clean,
+      phonetic: stemMatch.phonetic,
+      partOfSpeech: stemMatch.partOfSpeech,
+      translation: `${stemMatch.translation} (${stemMatch.word} 的變化型)`,
+      tip: stemMatch.tip,
+      source: 'vocab',
     };
   }
 
-  // 6. 線上權威辭典
+  // 4. 線上辭典
   return {
-    primary: {
-      word: clean,
-      translation: '',
-      source: 'online',
-    }
+    word: clean,
+    translation: '',
+    source: 'online',
   };
 };
+
+interface PhraseCandidate {
+  text: string;
+  tokenIndices: number[];
+  isFirstWord: boolean;
+  isLastWord: boolean;
+}
 
 export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
   sentence,
@@ -300,22 +386,23 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
   isDark = false,
   onWordSaved,
 }) => {
-  const [activeWord, setActiveWord] = useState<string | null>(null);
-  const [lookupInfo, setLookupInfo] = useState<LookupResult | null>(null);
-  const [singleWordFallback, setSingleWordFallback] = useState<LookupResult | null>(null);
-  const [showSingleWord, setShowSingleWord] = useState(false);
+  // 片語資料與單詞資料 (允許兩者共存並可雙向切換)
+  const [phraseData, setPhraseData] = useState<{ result: LookupResult; tokenIndices: number[] } | null>(null);
+  const [singleData, setSingleData] = useState<{ result: LookupResult; tokenIndices: number[] } | null>(null);
+  const [activeMode, setActiveMode] = useState<'phrase' | 'single'>('single');
+  const [selectedTokenIndices, setSelectedTokenIndices] = useState<number[]>([]);
   const [customMeaning, setCustomMeaning] = useState('');
   const [isSaved, setIsSaved] = useState(false);
 
   // 切割單字與標點符號
   const tokens = sentence.split(/([a-zA-Z'-]+)/g);
 
-  // 提取所有純英文單字及其 tokenIndex，便於相鄰片語上下文推斷
+  // 提取所有純英文單字及其 tokenIndex，用於相鄰片語精確推斷
   const wordTokens = tokens
-    .map((tok, idx) => ({ 
-      raw: tok, 
-      clean: tok.trim().toLowerCase().replace(/[^a-z]/g, ''), 
-      tokenIndex: idx 
+    .map((tok, idx) => ({
+      raw: tok,
+      clean: tok.trim().toLowerCase().replace(/[^a-z]/g, ''),
+      tokenIndex: idx,
     }))
     .filter(t => t.clean.length > 0);
 
@@ -329,48 +416,165 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
     // 尋找當前單字在 wordTokens 序列中的位置
     const currIdx = wordTokens.findIndex(t => t.tokenIndex === tokenIndex);
 
-    // 產生相鄰片語候選字 (2詞與3詞組合)
-    const adjacentCandidates: string[] = [];
+    // 僅在「緊鄰當前點擊單字」的前後範圍尋找組合候選 (排除全文亂匹配)
+    const phraseCandidates: PhraseCandidate[] = [];
     if (currIdx >= 0) {
-      const prev = wordTokens[currIdx - 1]?.clean;
-      const curr = wordTokens[currIdx]?.clean;
-      const next = wordTokens[currIdx + 1]?.clean;
-      const nextNext = wordTokens[currIdx + 2]?.clean;
+      const p2 = wordTokens[currIdx - 2];
+      const p1 = wordTokens[currIdx - 1];
+      const c0 = wordTokens[currIdx];
+      const n1 = wordTokens[currIdx + 1];
+      const n2 = wordTokens[currIdx + 2];
 
-      // 3詞優先
-      if (curr && next && nextNext) adjacentCandidates.push(`${curr} ${next} ${nextNext}`);
-      if (prev && curr && next) adjacentCandidates.push(`${prev} ${curr} ${next}`);
-      // 2詞 (如 turned out 或 out 前面的 turned)
-      if (curr && next) adjacentCandidates.push(`${curr} ${next}`);
-      if (prev && curr) adjacentCandidates.push(`${prev} ${curr}`);
+      // 3 詞片語
+      if (c0 && n1 && n2) {
+        phraseCandidates.push({
+          text: `${c0.clean} ${n1.clean} ${n2.clean}`,
+          tokenIndices: [c0.tokenIndex, n1.tokenIndex, n2.tokenIndex],
+          isFirstWord: true,
+          isLastWord: false,
+        });
+      }
+      if (p1 && c0 && n1) {
+        phraseCandidates.push({
+          text: `${p1.clean} ${c0.clean} ${n1.clean}`,
+          tokenIndices: [p1.tokenIndex, c0.tokenIndex, n1.tokenIndex],
+          isFirstWord: false,
+          isLastWord: false,
+        });
+      }
+      if (p2 && p1 && c0) {
+        phraseCandidates.push({
+          text: `${p2.clean} ${p1.clean} ${c0.clean}`,
+          tokenIndices: [p2.tokenIndex, p1.tokenIndex, c0.tokenIndex],
+          isFirstWord: false,
+          isLastWord: true,
+        });
+      }
+
+      // 2 詞片語 (如 sparkling water, turned out)
+      if (c0 && n1) {
+        phraseCandidates.push({
+          text: `${c0.clean} ${n1.clean}`,
+          tokenIndices: [c0.tokenIndex, n1.tokenIndex],
+          isFirstWord: true,
+          isLastWord: false,
+        });
+      }
+      if (p1 && c0) {
+        phraseCandidates.push({
+          text: `${p1.clean} ${c0.clean}`,
+          tokenIndices: [p1.tokenIndex, c0.tokenIndex],
+          isFirstWord: false,
+          isLastWord: true,
+        });
+      }
     }
 
-    const { primary, singleWordFallback: fallback } = lookupWordInContext(
-      clean,
-      sentence,
-      wordsPool,
-      adjacentCandidates
-    );
+    // 1. 先檢查相鄰是否構成動詞片語 (如 turned out, check in)
+    let matchedPhrasal: { candidate: PhraseCandidate; result: LookupResult } | null = null;
+    for (const cand of phraseCandidates) {
+      if (PHRASAL_VERBS_MAP[cand.text]) {
+        const ph = PHRASAL_VERBS_MAP[cand.text];
+        matchedPhrasal = {
+          candidate: cand,
+          result: {
+            word: cand.text,
+            baseWord: ph.base,
+            phonetic: ph.phonetic,
+            partOfSpeech: ph.pos,
+            translation: ph.trans,
+            tip: ph.explanation,
+            source: 'phrasal',
+          },
+        };
+        break;
+      }
+    }
 
-    // 播放發音：若是片語優先朗讀整組片語 (如 "turned out")，否則朗讀單字
-    speakText(primary.word, speechRate, speechLang);
+    // 2. 檢查相鄰是否構成詞庫中的多詞單字 (如 sparkling water, boarding pass)
+    let matchedVocabPhrase: { candidate: PhraseCandidate; result: LookupResult } | null = null;
+    if (!matchedPhrasal) {
+      for (const cand of phraseCandidates) {
+        const found = wordsPool.find(w => w.word.toLowerCase() === cand.text);
+        if (found) {
+          matchedVocabPhrase = {
+            candidate: cand,
+            result: {
+              word: found.word,
+              phonetic: found.phonetic,
+              partOfSpeech: found.partOfSpeech,
+              translation: found.translation,
+              tip: found.tip,
+              source: 'vocab',
+            },
+          };
+          break;
+        }
+      }
+    }
 
-    setActiveWord(primary.word);
-    setLookupInfo(primary);
-    setSingleWordFallback(fallback || null);
-    setShowSingleWord(false);
+    // 3. 準備單字本體的查詢結果
+    const singleLookup = lookupSingleWord(clean, wordsPool);
+    const singleObj = {
+      result: singleLookup,
+      tokenIndices: [tokenIndex],
+    };
+
+    // 4. 決策預設顯示模式與選取標記
+    if (matchedPhrasal) {
+      // 動詞片語/慣用語：因拆開無法理解字義，預設優先顯示片語
+      const phraseObj = {
+        result: matchedPhrasal.result,
+        tokenIndices: matchedPhrasal.candidate.tokenIndices,
+      };
+      setPhraseData(phraseObj);
+      setSingleData(singleObj);
+      setActiveMode('phrase');
+      setSelectedTokenIndices(phraseObj.tokenIndices);
+      speakText(phraseObj.result.word, speechRate, speechLang);
+    } else if (matchedVocabPhrase) {
+      // 複合名詞/搭配詞 (如 sparkling water)：
+      const phraseObj = {
+        result: matchedVocabPhrase.result,
+        tokenIndices: matchedVocabPhrase.candidate.tokenIndices,
+      };
+      setPhraseData(phraseObj);
+      setSingleData(singleObj);
+
+      // 若使用者點擊的是後面的核心名詞 (如點擊 water)，優先看 water 單字字義，避免被強制綁架成 sparkling water
+      if (matchedVocabPhrase.candidate.isLastWord) {
+        setActiveMode('single');
+        setSelectedTokenIndices(singleObj.tokenIndices);
+        speakText(singleObj.result.word, speechRate, speechLang);
+      } else {
+        // 若使用者點擊的是修飾詞 (如 sparkling)，預設顯示整個複合單詞
+        setActiveMode('phrase');
+        setSelectedTokenIndices(phraseObj.tokenIndices);
+        speakText(phraseObj.result.word, speechRate, speechLang);
+      }
+    } else {
+      // 無相鄰片語，純單字查詢
+      setPhraseData(null);
+      setSingleData(singleObj);
+      setActiveMode('single');
+      setSelectedTokenIndices(singleObj.tokenIndices);
+      speakText(singleObj.result.word, speechRate, speechLang);
+    }
+
     setCustomMeaning('');
     setIsSaved(false);
   };
 
   const handleClose = () => {
-    setActiveWord(null);
-    setLookupInfo(null);
-    setSingleWordFallback(null);
-    setShowSingleWord(false);
+    setPhraseData(null);
+    setSingleData(null);
+    setSelectedTokenIndices([]);
+    setCustomMeaning('');
+    setIsSaved(false);
   };
 
-  const displayedInfo = (showSingleWord && singleWordFallback) ? singleWordFallback : lookupInfo;
+  const displayedInfo = activeMode === 'phrase' ? phraseData?.result : singleData?.result;
+  const hasMultipleModes = !!phraseData && !!singleData;
 
   const handleSaveToCustomVocab = () => {
     if (!displayedInfo) return;
@@ -383,23 +587,23 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
       example: sentence,
       exampleTranslation: translation || '',
       category: 'daily',
-      categoryLabel: '自訂生詞'
+      categoryLabel: '自訂生詞',
     });
     setIsSaved(true);
     onWordSaved?.();
   };
 
-  const targetLookupWord = displayedInfo?.word || activeWord || '';
+  const targetLookupWord = displayedInfo?.word || '';
   const cambridgeUrl = `https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B9%81%E9%AB%94/${encodeURIComponent(targetLookupWord.toLowerCase())}`;
   const googleUrl = `https://translate.google.com/?sl=en&tl=zh-TW&text=${encodeURIComponent(targetLookupWord)}&op=translate`;
 
   // 全局 Bottom Sheet 彈窗 (使用 createPortal 掛載於 body，完全不撐開卡片，免滾動！)
-  const modalContent = activeWord && displayedInfo && (
-    <div 
+  const modalContent = displayedInfo && selectedTokenIndices.length > 0 && (
+    <div
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in"
       onClick={handleClose}
     >
-      <div 
+      <div
         onClick={(e) => e.stopPropagation()}
         className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-3.5 border-t sm:border border-slate-200 animate-slide-up text-slate-800 pb-8 sm:pb-5 max-h-[85vh] overflow-y-auto"
       >
@@ -450,6 +654,48 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
           </div>
         </div>
 
+        {/* 雙重語意分頁按鈕：當存在「單字」與「搭配片語」時提供一鍵切換 */}
+        {hasMultipleModes && phraseData && singleData && (
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl">
+            <button
+              onClick={() => {
+                if (activeMode !== 'single') {
+                  triggerHaptic('light');
+                  setActiveMode('single');
+                  setSelectedTokenIndices(singleData.tokenIndices);
+                  speakText(singleData.result.word, speechRate, speechLang);
+                }
+              }}
+              className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                activeMode === 'single'
+                  ? 'bg-white text-indigo-700 shadow-xs ring-1 ring-slate-200/50'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <span>單詞</span>
+              <span className="font-semibold text-[11px] truncate max-w-[110px]">「{singleData.result.word}」</span>
+            </button>
+            <button
+              onClick={() => {
+                if (activeMode !== 'phrase') {
+                  triggerHaptic('light');
+                  setActiveMode('phrase');
+                  setSelectedTokenIndices(phraseData.tokenIndices);
+                  speakText(phraseData.result.word, speechRate, speechLang);
+                }
+              }}
+              className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                activeMode === 'phrase'
+                  ? 'bg-white text-amber-800 shadow-xs ring-1 ring-amber-200/50'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <span>{phraseData.result.source === 'phrasal' ? '🔥 片語' : '📚 搭配片語'}</span>
+              <span className="font-semibold text-[11px] truncate max-w-[120px]">「{phraseData.result.word}」</span>
+            </button>
+          </div>
+        )}
+
         {/* 中文釋義主區塊 */}
         {displayedInfo.translation ? (
           <div className={`p-3.5 rounded-2xl border space-y-1.5 ${
@@ -461,21 +707,16 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
               <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                 displayedInfo.source === 'phrasal'
                   ? 'bg-amber-200 text-amber-900'
-                  : 'bg-emerald-100/90 text-emerald-800'
+                  : displayedInfo.source === 'vocab'
+                  ? 'bg-emerald-100/90 text-emerald-800'
+                  : 'bg-indigo-100 text-indigo-800'
               }`}>
-                {displayedInfo.source === 'phrasal' ? '🔥 智慧識別動詞片語' : displayedInfo.source === 'vocab' ? '本機核心詞庫' : '常用單字釋義'}
+                {displayedInfo.source === 'phrasal'
+                  ? '🔥 智慧識別動詞片語'
+                  : displayedInfo.source === 'vocab'
+                  ? '本機核心詞庫'
+                  : '常用單字釋義'}
               </span>
-
-              {/* 切換查看片語 / 單獨單詞 */}
-              {lookupInfo?.source === 'phrasal' && singleWordFallback && (
-                <button
-                  onClick={() => setShowSingleWord(!showSingleWord)}
-                  className="text-[11px] font-bold text-indigo-600 hover:underline flex items-center gap-1 bg-white/70 px-2 py-0.5 rounded-lg border border-indigo-100"
-                >
-                  <Layers className="w-3 h-3" />
-                  <span>{showSingleWord ? '返回片語釋義' : `看單詞「${singleWordFallback.word}」`}</span>
-                </button>
-              )}
             </div>
 
             <div className={`text-lg font-black pt-0.5 ${
@@ -493,7 +734,7 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
           </div>
         ) : (
           <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 text-xs text-slate-600 space-y-1">
-            <p className="font-semibold text-slate-700">此單字不在基礎 310 詞中，可透過線上辭典即時查閱或收錄：</p>
+            <p className="font-semibold text-slate-700">可透過線上辭典即時查閱或收錄：</p>
           </div>
         )}
 
@@ -566,7 +807,7 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
 
   return (
     <>
-      {/* 例句本體文字 (每個單字皆可點擊) */}
+      {/* 例句本體文字 (每個單字皆可點擊，精確標記 index 絕不跨詞誤標) */}
       <p className={`leading-relaxed select-text ${className}`}>
         {tokens.map((tok, idx) => {
           const isWord = /[a-zA-Z]/.test(tok);
@@ -574,7 +815,7 @@ export const InteractiveSentence: React.FC<InteractiveSentenceProps> = ({
             return <span key={idx}>{tok}</span>;
           }
 
-          const isSelected = activeWord?.toLowerCase().includes(tok.toLowerCase());
+          const isSelected = selectedTokenIndices.includes(idx);
           return (
             <span
               key={idx}

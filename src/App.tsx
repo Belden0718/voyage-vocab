@@ -3,8 +3,10 @@ import type { WordItem, UserWordProgress, CategoryType, UserStats } from './type
 import { 
   getAllWords, getWordProgressMap, recordWordReview, toggleStarWord, 
   getUserStats, saveCustomWord, getAppSettings, 
-  saveAppSettings, setCustomWords, setWordProgressMap, getCustomWords
+  saveAppSettings, setCustomWords, setWordProgressMap, getCustomWords,
+  recordQuizCompletedStats, saveUserStats
 } from './utils/storage';
+import { checkBadgeUnlocks, calculateLevelInfo } from './utils/gamification';
 import type { AppSettings } from './utils/storage';
 import { isFirebaseConfigured } from './services/firebase';
 import { 
@@ -27,7 +29,7 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [words, setWords] = useState<WordItem[]>([]);
   const [progressMap, setProgressMap] = useState<Record<string, UserWordProgress>>({});
-  const [stats, setStats] = useState<UserStats>({ streakDays: 1, lastActiveDate: '', totalMastered: 0, totalReviewed: 0 });
+  const [stats, setStats] = useState<UserStats>(getUserStats());
   const [settings, setSettings] = useState<AppSettings>(getAppSettings());
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'all'>('all');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -37,12 +39,44 @@ export const App: React.FC = () => {
   const isCloudReady = isFirebaseConfigured();
   const isSyncingFromCloud = useRef(false);
 
-  // 初始化本地資料載入
+  // 初始化本地資料載入 (含歷史學習紀錄自動回溯補算 EXP 與徽章)
   useEffect(() => {
     const loadedWords = getAllWords();
+    const loadedProgress = getWordProgressMap();
+    let currentStats = getUserStats();
+
+    // 若為新上線的等級系統，自動根據歷史學習進度回溯補發 EXP 與徽章
+    if (currentStats.exp === 0) {
+      const mastered = Object.values(loadedProgress).filter(p => p.box >= 2).length;
+      const learning = Object.values(loadedProgress).filter(p => p.box === 1).length;
+      const reviews = currentStats.totalReviewed || 0;
+      
+      const retroactiveExp = (mastered * 25) + (learning * 10) + (reviews * 5);
+      if (retroactiveExp > 0) {
+        currentStats = {
+          ...currentStats,
+          exp: retroactiveExp,
+        };
+        const levelInfo = calculateLevelInfo(retroactiveExp);
+        currentStats.level = levelInfo.level;
+        currentStats.levelTitle = levelInfo.title;
+
+        const badgeCheck = checkBadgeUnlocks(currentStats, loadedWords, loadedProgress);
+        if (badgeCheck.newlyUnlocked.length > 0) {
+          currentStats.badges = badgeCheck.updatedBadges;
+          currentStats.exp += badgeCheck.newlyUnlocked.length * 50;
+          const updatedLevel = calculateLevelInfo(currentStats.exp);
+          currentStats.level = updatedLevel.level;
+          currentStats.levelTitle = updatedLevel.title;
+        }
+
+        saveUserStats(currentStats);
+      }
+    }
+
     setWords(loadedWords);
-    setProgressMap(getWordProgressMap());
-    setStats(getUserStats());
+    setProgressMap(loadedProgress);
+    setStats(currentStats);
     setSettings(getAppSettings());
   }, []);
 
@@ -95,12 +129,20 @@ export const App: React.FC = () => {
         const unsubscribeCloud = subscribeCloudData(user, (newData) => {
           if (isSyncingFromCloud.current) return;
           if (newData.customWords) {
-            setCustomWords(newData.customWords);
-            setWords(getAllWords());
+            const currentCustom = getCustomWords();
+            const isCustomChanged = JSON.stringify(currentCustom) !== JSON.stringify(newData.customWords);
+            if (isCustomChanged) {
+              setCustomWords(newData.customWords);
+              setWords(getAllWords());
+            }
           }
           if (newData.progressMap) {
-            setWordProgressMap(newData.progressMap);
-            setProgressMap(newData.progressMap);
+            const currentMap = getWordProgressMap();
+            const isProgressChanged = JSON.stringify(currentMap) !== JSON.stringify(newData.progressMap);
+            if (isProgressChanged) {
+              setWordProgressMap(newData.progressMap);
+              setProgressMap(newData.progressMap);
+            }
           }
         });
 
@@ -118,13 +160,14 @@ export const App: React.FC = () => {
   // 輔助：自動同步至雲端
   const syncToCloudIfLoggedIn = (
     updatedProgress?: Record<string, UserWordProgress>,
-    updatedWords?: WordItem[]
+    updatedWords?: WordItem[],
+    updatedStats?: UserStats
   ) => {
     if (currentUser && !isSyncingFromCloud.current) {
       uploadDataToCloud(currentUser, {
         customWords: (updatedWords || words).filter(w => w.id.startsWith('custom-')),
         progressMap: updatedProgress || progressMap,
-        stats: getUserStats(),
+        stats: updatedStats || getUserStats(),
         updatedAt: Date.now(),
       });
     }
@@ -135,8 +178,9 @@ export const App: React.FC = () => {
     const updated = recordWordReview(wordId, rating);
     const nextMap = { ...progressMap, [wordId]: updated };
     setProgressMap(nextMap);
-    setStats(getUserStats());
-    syncToCloudIfLoggedIn(nextMap);
+    const updatedStats = getUserStats();
+    setStats(updatedStats);
+    syncToCloudIfLoggedIn(nextMap, undefined, updatedStats);
   };
 
   // 處理星標切換
@@ -159,9 +203,33 @@ export const App: React.FC = () => {
     syncToCloudIfLoggedIn(undefined, nextWords);
   };
 
-  // 測驗結果反饋
+  // 測驗結果即時反饋
   const handleQuizResult = (wordId: string, isCorrect: boolean) => {
     handleReviewWord(wordId, isCorrect ? 'good' : 'again');
+  };
+
+  // 測驗完成全套結算 (發放 EXP、計算徽章解鎖)
+  const handleQuizComplete = (score: number, total: number) => {
+    const { stats: updatedStats, expEarned } = recordQuizCompletedStats(score, total);
+    const badgeResult = checkBadgeUnlocks(updatedStats, words, progressMap);
+
+    let totalEarned = expEarned;
+    if (badgeResult.newlyUnlocked.length > 0) {
+      updatedStats.badges = badgeResult.updatedBadges;
+      const badgeBonus = badgeResult.newlyUnlocked.length * 50;
+      updatedStats.exp += badgeBonus;
+      totalEarned += badgeBonus;
+      saveUserStats(updatedStats);
+    }
+
+    setStats({ ...updatedStats });
+    syncToCloudIfLoggedIn(undefined, undefined, updatedStats);
+
+    return {
+      expEarned: totalEarned,
+      newlyUnlocked: badgeResult.newlyUnlocked,
+      currentStats: updatedStats,
+    };
   };
 
   // 更新個人設定
@@ -234,6 +302,7 @@ export const App: React.FC = () => {
             <DashboardView
               words={words}
               progressMap={progressMap}
+              stats={stats}
               onChangeTab={setActiveTab}
               onSelectCategory={(cat) => setSelectedCategory(cat)}
             />
@@ -255,6 +324,7 @@ export const App: React.FC = () => {
               words={words}
               settings={settings}
               onRecordResult={handleQuizResult}
+              onQuizComplete={handleQuizComplete}
             />
           )}
 

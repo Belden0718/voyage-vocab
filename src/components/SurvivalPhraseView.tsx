@@ -5,7 +5,8 @@ import type { AppSettings } from '../utils/storage';
 import { speakText, triggerHaptic } from '../utils/speech';
 import { 
   Volume2, Search, Maximize2, X, MessageSquare, 
-  Plane, Hotel, Utensils, ShoppingBag, Train, AlertCircle 
+  Plane, Hotel, Utensils, ShoppingBag, Train, AlertCircle,
+  Users, Compass, Smartphone, Beer
 } from 'lucide-react';
 
 interface SurvivalPhraseViewProps {
@@ -20,6 +21,10 @@ const CATEGORIES: { id: CategoryType | 'all'; label: string; icon: React.Element
   { id: 'shopping', label: '購物', icon: ShoppingBag },
   { id: 'transport', label: '交通', icon: Train },
   { id: 'emergency', label: '緊急', icon: AlertCircle },
+  { id: 'social', label: '社交', icon: Users },
+  { id: 'culture', label: '文化', icon: Compass },
+  { id: 'digital', label: '數位', icon: Smartphone },
+  { id: 'service', label: '維權', icon: Beer },
 ];
 
 export const SurvivalPhraseView: React.FC<SurvivalPhraseViewProps> = ({ settings }) => {

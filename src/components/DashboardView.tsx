@@ -1,15 +1,18 @@
-import React from 'react';
-import type { WordItem, UserWordProgress, CategoryType } from '../types';
+import React, { useState } from 'react';
+import type { WordItem, UserWordProgress, CategoryType, UserStats, BadgeItem } from '../types';
 import type { TabType } from './BottomNav';
 import { 
   Plane, Hotel, Utensils, ShoppingBag, Train, MessageCircle, AlertCircle, 
-  Play, Sparkles, CheckCircle2, ChevronRight, Trophy, Bookmark
+  Play, Sparkles, CheckCircle2, ChevronRight, Trophy, Bookmark,
+  Zap, Award, Flame, Lock, Users, Compass, Smartphone, Beer
 } from 'lucide-react';
 import { triggerHaptic } from '../utils/speech';
+import { calculateLevelInfo, ALL_BADGES } from '../utils/gamification';
 
 interface DashboardViewProps {
   words: WordItem[];
   progressMap: Record<string, UserWordProgress>;
+  stats?: UserStats;
   onChangeTab: (tab: TabType) => void;
   onSelectCategory: (category: CategoryType) => void;
 }
@@ -22,20 +25,33 @@ const CATEGORY_META: Record<CategoryType, { label: string; icon: React.ElementTy
   transport: { label: '交通與指路', icon: Train, color: 'text-indigo-600', bg: 'bg-indigo-50' },
   daily: { label: '日常口語俚語', icon: MessageCircle, color: 'text-purple-600', bg: 'bg-purple-50' },
   emergency: { label: '緊急與醫療', icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
+  social: { label: '社交破冰與閒聊', icon: Users, color: 'text-violet-600', bg: 'bg-violet-50' },
+  culture: { label: '文化生活與探索', icon: Compass, color: 'text-teal-600', bg: 'bg-teal-50' },
+  digital: { label: '數位通訊與自駕', icon: Smartphone, color: 'text-cyan-600', bg: 'bg-cyan-50' },
+  service: { label: '爭議維權與酒吧', icon: Beer, color: 'text-amber-700', bg: 'bg-amber-100/60' },
 };
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   words,
   progressMap,
+  stats,
   onChangeTab,
   onSelectCategory,
 }) => {
+  const [selectedBadge, setSelectedBadge] = useState<BadgeItem | null>(null);
+
   // 統計數據計算
   const totalCount = words.length;
   const masteredCount = Object.values(progressMap).filter(p => p.box >= 2).length;
   const learningCount = Object.values(progressMap).filter(p => p.box === 1).length;
   const starredCount = Object.values(progressMap).filter(p => p.isStarred).length;
   const progressPercent = totalCount > 0 ? Math.round((masteredCount / totalCount) * 100) : 0;
+
+  // 等級資訊
+  const currentExp = stats?.exp ?? 0;
+  const levelInfo = calculateLevelInfo(currentExp);
+  const streakDays = stats?.streakDays ?? 1;
+  const unlockedBadges = new Set(stats?.badges || []);
 
   // 分類統計
   const categories = Object.keys(CATEGORY_META) as CategoryType[];
@@ -48,7 +64,57 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-5 pb-8 animate-fade-in">
-      {/* 頂部今日焦點看板 */}
+      {/* 冒險者旅行等級進度卡 (Level & EXP Card) */}
+      <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden border border-indigo-900/50">
+        <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="relative z-10 space-y-3.5">
+          {/* 頂部稱號與連續天數 */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{levelInfo.icon}</span>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-black px-2 py-0.5 rounded-md bg-amber-400 text-amber-950">
+                    Lv.{levelInfo.level}
+                  </span>
+                  <span className="text-sm font-bold text-slate-100">{levelInfo.title}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 連續學習 Streak 標籤 */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-bold">
+              <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
+              <span>{streakDays} 天打卡</span>
+            </div>
+          </div>
+
+          {/* 經驗值長條 */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex justify-between text-xs text-slate-300">
+              <span className="flex items-center gap-1 font-mono text-[11px]">
+                <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                經驗值 (EXP)
+              </span>
+              <span className="font-mono font-bold text-amber-400">
+                {levelInfo.currentExp} / {levelInfo.maxExp} EXP
+              </span>
+            </div>
+            <div className="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden border border-slate-700/50">
+              <div 
+                className="bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-500 h-full rounded-full transition-all duration-700 ease-out"
+                style={{ width: `${levelInfo.progressPercent}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-slate-400 text-right">
+              {levelInfo.isMaxLevel ? '👑 已達最高榮譽旅行家等級' : `距離下一級還差 ${levelInfo.maxExp - levelInfo.currentExp} EXP`}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 學習焦點橫幅 */}
       <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-sky-700 rounded-3xl p-5 text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
         
@@ -62,16 +128,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div>
-            <h2 className="text-2xl font-black tracking-tight">自信開口說英語</h2>
+            <h2 className="text-2xl font-black tracking-tight">出國溝通零障礙</h2>
             <p className="text-xs text-indigo-100/90 mt-1 leading-relaxed">
-              涵蓋機場、登機、飯店、點餐、買單到緊急求助必備單字與例句。
+              涵蓋機場、飯店、美食、購物、緊急求助、社交、3C 通訊、自駕與維權 310+ 核心單字。
             </p>
           </div>
 
           {/* 進度總覽條 */}
           <div className="bg-black/20 backdrop-blur-md p-3 rounded-2xl space-y-2">
             <div className="flex justify-between items-center text-xs">
-              <span className="text-indigo-100 font-medium">總體掌握進度</span>
+              <span className="text-indigo-100 font-medium">單字總體掌握度</span>
               <span className="font-bold text-white">{masteredCount} / {totalCount} 詞 ({progressPercent}%)</span>
             </div>
             <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
@@ -92,7 +158,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className="flex items-center justify-center gap-2 bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-sm py-2.5 px-4 rounded-xl shadow-md active:scale-95 transition-all"
             >
               <Play className="w-4 h-4 fill-indigo-600 text-indigo-600" />
-              開始翻卡複習
+              開始翻卡學習
             </button>
             <button
               onClick={() => {
@@ -108,7 +174,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* 學習數據統計區塊 */}
+      {/* 學習數據統計指標 */}
       <div className="grid grid-cols-3 gap-2.5">
         <div className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center">
           <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1">
@@ -133,6 +199,76 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <span className="text-lg font-black text-slate-800">{starredCount}</span>
           <span className="text-[11px] text-slate-400 font-medium">星標珍藏</span>
         </div>
+      </div>
+
+      {/* 成就榮譽徽章展示櫃 (Badges Showcase) */}
+      <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Award className="w-4 h-4 text-amber-500" />
+            <h3 className="font-bold text-slate-800 text-sm">成就榮譽徽章</h3>
+          </div>
+          <span className="text-xs font-bold text-indigo-600">
+            已解鎖 {unlockedBadges.size} / {ALL_BADGES.length}
+          </span>
+        </div>
+
+        {/* 徽章水平滾動/網格列表 */}
+        <div className="grid grid-cols-5 gap-2 pt-1">
+          {ALL_BADGES.map(badge => {
+            const isUnlocked = unlockedBadges.has(badge.id);
+            return (
+              <button
+                key={badge.id}
+                onClick={() => {
+                  triggerHaptic('light');
+                  setSelectedBadge(badge);
+                }}
+                className={`relative flex flex-col items-center p-2 rounded-2xl border transition-all active:scale-95 ${
+                  isUnlocked 
+                    ? 'bg-amber-50/70 border-amber-200 shadow-xs' 
+                    : 'bg-slate-50/60 border-slate-100 opacity-40 grayscale'
+                }`}
+              >
+                <span className="text-2xl mb-1">{badge.icon}</span>
+                <span className="text-[10px] font-bold text-slate-700 truncate w-full text-center">
+                  {badge.name}
+                </span>
+                {!isUnlocked && (
+                  <div className="absolute top-1 right-1 w-3 h-3 bg-slate-400/80 rounded-full flex items-center justify-center text-white">
+                    <Lock className="w-2 h-2" />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 點選查看徽章詳細解鎖條件彈窗/條目 */}
+        {selectedBadge && (
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-xs flex items-center justify-between animate-fade-in mt-2">
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">{selectedBadge.icon}</span>
+              <div>
+                <p className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>{selectedBadge.name}</span>
+                  {unlockedBadges.has(selectedBadge.id) ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">已解鎖 (+50 EXP)</span>
+                  ) : (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-bold">未解鎖</span>
+                  )}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">{selectedBadge.description}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedBadge(null)}
+              className="text-slate-400 hover:text-slate-600 text-xs px-2 py-1"
+            >
+              關閉
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 場景分類學習專區 */}

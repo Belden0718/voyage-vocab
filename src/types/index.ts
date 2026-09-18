@@ -5,7 +5,11 @@ export type CategoryType =
   | 'shopping'     // 購物退稅
   | 'transport'    // 交通指路
   | 'daily'        // 生活常用口語
-  | 'emergency';   // 緊急醫療
+  | 'emergency'    // 緊急醫療
+  | 'social'       // 社交破冰與旅行交友
+  | 'culture'      // 文化生活與深度探索
+  | 'digital'      // 數位通訊與自駕戶外
+  | 'service';     // 爭議維權與夜生活酒吧
 
 export interface WordItem {
   id: string;
@@ -52,9 +56,24 @@ export interface QuizQuestion {
   explanation: string;
 }
 
+export interface BadgeItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string; // Emoji
+  category: string;
+  unlockedAt?: number;
+}
+
 export interface UserStats {
   streakDays: number;
   lastActiveDate: string;
   totalMastered: number;
   totalReviewed: number;
+  exp: number;
+  level: number;
+  levelTitle: string;
+  badges: string[];
+  quizCompletedCount: number;
+  perfectQuizCount: number;
 }

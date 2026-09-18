@@ -1,7 +1,9 @@
 import type { WordItem } from '../types';
 
 export const INITIAL_VOCABULARY: WordItem[] = [
-  // --- 機場與飛行 (Airport & Flight) ---
+  // ==========================================
+  // --- 1. 機場與飛行 (Airport & Flight) ---
+  // ==========================================
   {
     id: 'vocab-1',
     word: 'boarding pass',
@@ -62,10 +64,96 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     exampleTranslation: '我們在飛往紐約前，會在東京轉機停留四個小時。',
     tip: '一般 24 小時內稱為 layover；超過 24 小時長停留通常稱為 stopover。'
   },
-
-  // --- 飯店與住宿 (Hotel & Lodging) ---
   {
     id: 'vocab-6',
+    word: 'excess baggage',
+    phonetic: '/ɪkˈses ˈbæɡɪdʒ/',
+    partOfSpeech: 'n.',
+    translation: '超重行李 / 行李超重費',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'You will have to pay an excess baggage fee for this heavy suitcase.',
+    exampleTranslation: '這件行李太重了，您必須支付行李超重費用。',
+    tip: '廉航（LCC）對超重行李非常嚴格，出發前務必先秤重。'
+  },
+  {
+    id: 'vocab-7',
+    word: 'gate change',
+    phonetic: '/ɡeɪt tʃeɪndʒ/',
+    partOfSpeech: 'n.',
+    translation: '登機門變更',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'Attention passengers, there is a gate change for Flight 204 to Gate B12.',
+    exampleTranslation: '各位旅客請注意，204 班機登機門已更改為 B12。',
+    tip: '在候機室請隨時抬頭看螢幕確認登機門資訊。'
+  },
+  {
+    id: 'vocab-8',
+    word: 'turbulence',
+    phonetic: '/ˈtɜːrbjələns/',
+    partOfSpeech: 'n.',
+    translation: '亂流 / 氣流顛簸',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'We are experiencing some turbulence, please fasten your seatbelts.',
+    exampleTranslation: '我們現在遇到亂流，請繫好您的安全帶。',
+    tip: '機長亮起安全帶燈號時，請勿離開座位使用洗手間。'
+  },
+  {
+    id: 'vocab-9',
+    word: 'jet lag',
+    phonetic: '/ˈdʒet læɡ/',
+    partOfSpeech: 'n.',
+    translation: '時差 / 時差反應',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'I usually take a short nap to recover from jet lag after long flights.',
+    exampleTranslation: '長途飛行後，我通常會小睡片刻來緩解時差。',
+    tip: '在機上先調整手錶至目的地時區，有助於心理適應。'
+  },
+  {
+    id: 'vocab-10',
+    word: 'aisle seat',
+    phonetic: '/aɪl siːt/',
+    partOfSpeech: 'n.',
+    translation: '靠走道座位',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'Could I have an aisle seat near the front of the plane, please?',
+    exampleTranslation: '可以幫我安排靠飛機前段的走道座位嗎？謝謝。',
+    tip: '靠窗座位是 window seat，夾在中間的則是 middle seat。'
+  },
+  {
+    id: 'vocab-11',
+    word: 'final call',
+    phonetic: '/ˈfaɪnl kɔːl/',
+    partOfSpeech: 'n.',
+    translation: '最後登機廣播',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'This is the final call for passenger Wang on Flight 108.',
+    exampleTranslation: '這是對搭乘 108 班機的王姓旅客進行的最後登機廣播。',
+    tip: '聽到 final call 代表登機門即將關閉，必須立刻快步前往。'
+  },
+  {
+    id: 'vocab-12',
+    word: 'duty-free',
+    phonetic: '/ˌduːti ˈfriː/',
+    partOfSpeech: 'adj. / n.',
+    translation: '免稅的 / 機場免稅店',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'I bought some local perfumes at the airport duty-free shop.',
+    exampleTranslation: '我在機場免稅商店買了一些當地的香水。',
+    tip: '免稅品購買液體超過 100ml 需由店員以安全密封袋封存。'
+  },
+
+  // ==========================================
+  // --- 2. 飯店與住宿 (Hotel & Lodging) ---
+  // ==========================================
+  {
+    id: 'vocab-13',
     word: 'complimentary',
     phonetic: '/ˌkɑːmplɪˈmentri/',
     partOfSpeech: 'adj.',
@@ -74,10 +162,10 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     categoryLabel: '飯店與住宿',
     example: 'Breakfast and bottled water in the room are complimentary.',
     exampleTranslation: '早餐與房內的瓶裝水是免費提供的。',
-    tip: '飯店常用 complimentary 代替 free，看起來更典雅。'
+    tip: '飯店常用 complimentary 代替 free，顯得更有禮貌與質感。'
   },
   {
-    id: 'vocab-7',
+    id: 'vocab-14',
     word: 'concierge',
     phonetic: '/kɔːnˈsjerʒ/',
     partOfSpeech: 'n.',
@@ -89,19 +177,19 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '問路、叫計程車或預約演出都可以找禮賓部。'
   },
   {
-    id: 'vocab-8',
+    id: 'vocab-15',
     word: 'amenities',
     phonetic: '/əˈmenətiz/',
     partOfSpeech: 'n.',
-    translation: '便利設施 / 備品',
+    translation: '便利設施 / 客房備品',
     category: 'hotel',
     categoryLabel: '飯店與住宿',
     example: 'Does this hotel have amenities like a gym and heated swimming pool?',
     exampleTranslation: '這家飯店有健身房和溫水游泳池等便利設施嗎？',
-    tip: '也常指客房內的洗髮精、牙刷、吹風機等備品。'
+    tip: '也常指洗髮精、牙刷、吹風機、熨斗等客房備品。'
   },
   {
-    id: 'vocab-9',
+    id: 'vocab-16',
     word: 'wake-up call',
     phonetic: '/ˈweɪk ʌp kɔːl/',
     partOfSpeech: 'n.',
@@ -110,24 +198,86 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     categoryLabel: '飯店與住宿',
     example: 'Could I request a wake-up call for tomorrow morning at 6:30?',
     exampleTranslation: '我可以預約明天早上六點半的叫醒服務嗎？',
-    tip: '趕清晨航班時向櫃台預約最安心。'
+    tip: '趕清晨航班或行程時向櫃台預約最安心。'
   },
   {
-    id: 'vocab-10',
+    id: 'vocab-17',
     word: 'deposit',
     phonetic: '/dɪˈpɑːzɪt/',
     partOfSpeech: 'n. / v.',
-    translation: '押金 / 訂金',
+    translation: '押金 / 保證金',
     category: 'hotel',
     categoryLabel: '飯店與住宿',
     example: 'We require a $100 security deposit upon check-in, payable by credit card.',
     exampleTranslation: '我們在登記入住時需要收取 100 美元保證金，可使用信用卡支付。',
-    tip: '退房檢查無誤後信用卡預授權會自動退還。'
+    tip: '退房檢查無誤後信用卡預授權會自動取消。'
+  },
+  {
+    id: 'vocab-18',
+    word: 'late check-out',
+    phonetic: '/leɪt tʃek aʊt/',
+    partOfSpeech: 'n.',
+    translation: '延後退房',
+    category: 'hotel',
+    categoryLabel: '飯店與住宿',
+    example: 'Is it possible to arrange a late check-out until 1:00 PM?',
+    exampleTranslation: '請問有可能安排延後到下午一點退房嗎？',
+    tip: '許多飯店提供會員免費延後退房 1~2 小時服務。'
+  },
+  {
+    id: 'vocab-19',
+    word: 'housekeeping',
+    phonetic: '/ˈhaʊskiːpɪŋ/',
+    partOfSpeech: 'n.',
+    translation: '客房清潔 / 房務部',
+    category: 'hotel',
+    categoryLabel: '飯店與住宿',
+    example: 'Please call housekeeping if you need fresh towels and bedsheets.',
+    exampleTranslation: '如果您需要乾淨的毛巾與床單，請致電房務部。',
+    tip: '若不想被打擾，可在門把掛上 "Do Not Disturb" (請勿打擾)。'
+  },
+  {
+    id: 'vocab-20',
+    word: 'adapter',
+    phonetic: '/əˈdæptər/',
+    partOfSpeech: 'n.',
+    translation: '萬用轉接頭 / 插頭轉接器',
+    category: 'hotel',
+    categoryLabel: '飯店與住宿',
+    example: 'Do you have an international power adapter I could borrow from the front desk?',
+    exampleTranslation: '請問櫃台有各國通用電源轉接頭可以借用嗎？',
+    tip: '轉接頭 (adapter) 只變換插頭形狀；變壓器則是 voltage converter。'
+  },
+  {
+    id: 'vocab-21',
+    word: 'luggage storage',
+    phonetic: '/ˈlʌɡɪdʒ ˈstɔːrɪdʒ/',
+    partOfSpeech: 'n.',
+    translation: '行李寄存處',
+    category: 'hotel',
+    categoryLabel: '飯店與住宿',
+    example: 'Can we leave our bags in the luggage storage until our evening flight?',
+    exampleTranslation: '我們可以在晚上的班機前把行李寄存在行李房嗎？',
+    tip: '寄存行李後櫃台會給您一張行李號碼牌 (claim tag)。'
+  },
+  {
+    id: 'vocab-22',
+    word: 'key card',
+    phonetic: '/kiː kɑːrd/',
+    partOfSpeech: 'n.',
+    translation: '感應房卡',
+    category: 'hotel',
+    categoryLabel: '飯店與住宿',
+    example: 'My key card seems to be demagnetized; it won\'t open the door.',
+    exampleTranslation: '我的房卡好像消磁了，打不開房門。',
+    tip: '盡量避免將磁條房卡與手機貼在一起，以防消磁。'
   },
 
-  // --- 餐廳與美食 (Dining & Food) ---
+  // ==========================================
+  // --- 3. 餐廳與美食 (Dining & Food) ---
+  // ==========================================
   {
-    id: 'vocab-11',
+    id: 'vocab-23',
     word: 'reservation',
     phonetic: '/ˌrezərˈveɪʃn/',
     partOfSpeech: 'n.',
@@ -139,7 +289,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '進餐廳先說 "I have a reservation under [你的姓氏]"。'
   },
   {
-    id: 'vocab-12',
+    id: 'vocab-24',
     word: 'allergic to',
     phonetic: '/əˈlɜːrdʒɪk tuː/',
     partOfSpeech: 'adj. phr.',
@@ -151,7 +301,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '點餐時務必先聲明過敏源，避免引發食物過敏。'
   },
   {
-    id: 'vocab-13',
+    id: 'vocab-25',
     word: 'tap water',
     phonetic: '/ˈtæp ˌwɔːtər/',
     partOfSpeech: 'n.',
@@ -163,7 +313,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '國外餐廳服務生問 "Still, sparkling or tap?"，選 tap 是免費的。'
   },
   {
-    id: 'vocab-14',
+    id: 'vocab-26',
     word: 'to go / take out',
     phonetic: '/tuː ɡoʊ/',
     partOfSpeech: 'phr.',
@@ -175,7 +325,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '美式常問 "For here or to go?"；英式常問 "Eat in or take away?"。'
   },
   {
-    id: 'vocab-15',
+    id: 'vocab-27',
     word: 'split the bill',
     phonetic: '/splɪt ðə bɪl/',
     partOfSpeech: 'phr. v.',
@@ -186,10 +336,96 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     exampleTranslation: '請問我們可以分刷兩張信用卡嗎？',
     tip: '口語也可以說 "Can we go Dutch?" 或 "Separate checks, please."。'
   },
-
-  // --- 購物與退稅 (Shopping & Tax Free) ---
   {
-    id: 'vocab-16',
+    id: 'vocab-28',
+    word: 'vegetarian',
+    phonetic: '/ˌvedʒəˈteriən/',
+    partOfSpeech: 'n. / adj.',
+    translation: '素食者 / 素食的 (蛋奶素)',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'Do you have any vegetarian options on the lunch menu?',
+    exampleTranslation: '請問午餐菜單上有任何素食選項嗎？',
+    tip: '嚴格純全素（不含蛋、奶、蜂蜜）則是 vegan。'
+  },
+  {
+    id: 'vocab-29',
+    word: 'gluten-free',
+    phonetic: '/ˈɡluːtn friː/',
+    partOfSpeech: 'adj.',
+    translation: '無麩質的',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'Is this pasta made with gluten-free flour?',
+    exampleTranslation: '這份義大利麵是用無麩質麵粉製作的嗎？',
+    tip: '歐美菜單上常縮寫為 GF。'
+  },
+  {
+    id: 'vocab-30',
+    word: 'medium-rare',
+    phonetic: '/ˌmiːdiəm ˈrer/',
+    partOfSpeech: 'adj.',
+    translation: '三分熟 / 三至四分熟 (牛排熟度)',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'I would like the ribeye steak cooked medium-rare, please.',
+    exampleTranslation: '我想要肋眼牛排煎至三分熟，謝謝。',
+    tip: '熟度依序為：rare(一分)、medium-rare(三分)、medium(五分)、well-done(全熟)。'
+  },
+  {
+    id: 'vocab-31',
+    word: 'dressing on the side',
+    phonetic: '/ˈdresɪŋ ɑːn ðə saɪd/',
+    partOfSpeech: 'phr.',
+    translation: '沙拉醬另外放 / 醬汁分開裝',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'Could I get the Caesar salad with the dressing on the side?',
+    exampleTranslation: '我可以點凱薩沙拉並將醬料另外分開放嗎？',
+    tip: '不想吃太油或重鹹時這句話非常實用。'
+  },
+  {
+    id: 'vocab-32',
+    word: 'gratuity',
+    phonetic: '/ɡrəˈtuːəti/',
+    partOfSpeech: 'n.',
+    translation: '小費 / 服務費',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'An 18% gratuity has already been included in your total check.',
+    exampleTranslation: '帳單總金額中已直接包含 18% 的服務小費。',
+    tip: '結帳時先看帳單有無包含 gratuity，避免重複重複給小費。'
+  },
+  {
+    id: 'vocab-33',
+    word: 'specialty',
+    phonetic: '/ˈspeʃəlti/',
+    partOfSpeech: 'n.',
+    translation: '招牌特產 / 主打菜餚',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'The seafood paella is the house specialty here.',
+    exampleTranslation: '西班牙海鮮燉飯是這家餐廳的鎮店招牌菜。',
+    tip: '不知道點什麼時，問 "What is your house specialty?" 準沒錯。'
+  },
+  {
+    id: 'vocab-34',
+    word: 'cutlery',
+    phonetic: '/ˈkʌtləri/',
+    partOfSpeech: 'n.',
+    translation: '刀叉餐具',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'Excuse me, could we have an extra set of cutlery, please?',
+    exampleTranslation: '不好意思，可以再給我們一套餐具嗎？',
+    tip: '美式英文也常稱 silverware 或 utensils。'
+  },
+
+  // ==========================================
+  // --- 4. 購物與退稅 (Shopping & Tax Free) ---
+  // ==========================================
+  {
+    id: 'vocab-35',
     word: 'fitting room',
     phonetic: '/ˈfɪtɪŋ ruːm/',
     partOfSpeech: 'n.',
@@ -201,7 +437,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '英式有時稱為 dressing room 或 changing room。'
   },
   {
-    id: 'vocab-17',
+    id: 'vocab-36',
     word: 'tax refund',
     phonetic: '/tæks ˈriːfʌnd/',
     partOfSpeech: 'n.',
@@ -213,7 +449,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '記得隨身攜帶護照正本，店員才能開立 Tax Free 單據。'
   },
   {
-    id: 'vocab-18',
+    id: 'vocab-37',
     word: 'out of stock',
     phonetic: '/aʊt əv stɑːk/',
     partOfSpeech: 'adj. phr.',
@@ -225,7 +461,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '反義詞是有現貨：in stock。'
   },
   {
-    id: 'vocab-19',
+    id: 'vocab-38',
     word: 'receipt',
     phonetic: '/rɪˈsiːt/',
     partOfSpeech: 'n.',
@@ -237,7 +473,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '注意發音中字母 p 不發音，唸作 /rɪˈsiːt/。'
   },
   {
-    id: 'vocab-20',
+    id: 'vocab-39',
     word: 'bargain',
     phonetic: '/ˈbɑːrɡən/',
     partOfSpeech: 'n. / v.',
@@ -248,14 +484,76 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     exampleTranslation: '打五折只要半價，這款皮包實在太划算了！',
     tip: '在傳統市集若想議價，可禮貌詢問 "Can you give me a better deal?"。'
   },
-
-  // --- 交通與指路 (Transport & Directions) ---
   {
-    id: 'vocab-21',
+    id: 'vocab-40',
+    word: 'clearance sale',
+    phonetic: '/ˈklɪrəns seɪl/',
+    partOfSpeech: 'n.',
+    translation: '清倉特賣 / 出清促銷',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'Everything on this rack is on clearance sale for up to 70% off.',
+    exampleTranslation: '這個貨架上的所有商品都是清倉特賣，最高享三折優惠。',
+    tip: '通常 clearance 商品售出後可能不接受退換 (final sale)。'
+  },
+  {
+    id: 'vocab-41',
+    word: 'contactless payment',
+    phonetic: '/ˈkɑːntæktləs ˈpeɪmənt/',
+    partOfSpeech: 'n.',
+    translation: '感應式支付 (Apple Pay / 信用卡感應)',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'Do you accept contactless payments like Apple Pay?',
+    exampleTranslation: '請問你們接受像 Apple Pay 這樣的感應式行動支付嗎？',
+    tip: '出國刷卡也可以直接說 "Tap to pay"。'
+  },
+  {
+    id: 'vocab-42',
+    word: 'warranty',
+    phonetic: '/ˈwɔːrənti/',
+    partOfSpeech: 'n.',
+    translation: '保固 / 保證書',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'Does this electronic device come with an international warranty?',
+    exampleTranslation: '這款電子設備有附帶全球國際保固嗎？',
+    tip: '在國外買高價電器，記得問有無 international warranty。'
+  },
+  {
+    id: 'vocab-43',
+    word: 'buy one get one free',
+    phonetic: '/baɪ wʌn ɡet wʌn friː/',
+    partOfSpeech: 'phr.',
+    translation: '買一送一 (BOGO)',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'These skin care lotions are buy one get one free today.',
+    exampleTranslation: '這些護膚乳液今天有買一送一的優惠活動。',
+    tip: '國外商店告示牌上經常簡寫為 BOGO。'
+  },
+  {
+    id: 'vocab-44',
+    word: 'exchange policy',
+    phonetic: '/ɪksˈtʃeɪndʒ ˈpɑːləsi/',
+    partOfSpeech: 'n.',
+    translation: '換貨政策',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'What is your store\'s exchange policy if the size doesn\'t fit?',
+    exampleTranslation: '如果尺寸不合，你們店裡的換貨規定是什麼？',
+    tip: '換貨是 exchange；若是退錢則是 refund。'
+  },
+
+  // ==========================================
+  // --- 5. 交通與指路 (Transport & Directions) ---
+  // ==========================================
+  {
+    id: 'vocab-45',
     word: 'platform',
     phonetic: '/ˈplætfɔːrm/',
     partOfSpeech: 'n.',
-    translation: '月台',
+    translation: '火車 / 地鐵月台',
     category: 'transport',
     categoryLabel: '交通與指路',
     example: 'The express train to Oxford departs from Platform 4.',
@@ -263,7 +561,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '車站大廳螢幕上留意 Departures 與對應的 Platform 編號。'
   },
   {
-    id: 'vocab-22',
+    id: 'vocab-46',
     word: 'transfer',
     phonetic: '/trænsˈfɜːr/',
     partOfSpeech: 'v. / n.',
@@ -275,7 +573,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '問路常用："Where should I transfer to the airport express?"'
   },
   {
-    id: 'vocab-23',
+    id: 'vocab-47',
     word: 'one-way ticket',
     phonetic: '/ˌwʌnˈweɪ ˈtɪkɪt/',
     partOfSpeech: 'n.',
@@ -287,7 +585,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '來回票美式叫 round-trip ticket，英式叫 return ticket。'
   },
   {
-    id: 'vocab-24',
+    id: 'vocab-48',
     word: 'pedestrian',
     phonetic: '/pəˈdestriən/',
     partOfSpeech: 'n.',
@@ -299,7 +597,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '斑馬線英文常用 crosswalk (美) 或 zebra crossing (英)。'
   },
   {
-    id: 'vocab-25',
+    id: 'vocab-49',
     word: 'fare',
     phonetic: '/fer/',
     partOfSpeech: 'n.',
@@ -310,10 +608,72 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     exampleTranslation: '從市中心到機場的計程車車資大約是多少？',
     tip: '公車上常見 "Exact fare only" 表示不找零，需備妥零錢。'
   },
-
-  // --- 生活常用口語 (Daily Chitchat & Slang) ---
   {
-    id: 'vocab-26',
+    id: 'vocab-50',
+    word: 'shuttle bus',
+    phonetic: '/ˈʃʌtl bʌs/',
+    partOfSpeech: 'n.',
+    translation: '定點接駁公車',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'Is there a free shuttle bus from the hotel to the airport terminal?',
+    exampleTranslation: '請問飯店有提供前往機場航廈的免費接駁巴士嗎？',
+    tip: '許多大型度假村或暢貨中心 (Outlet) 都提供接駁專車。'
+  },
+  {
+    id: 'vocab-51',
+    word: 'rush hour',
+    phonetic: '/ˈrʌʃ aʊər/',
+    partOfSpeech: 'n.',
+    translation: '交通尖峰時段 / 上下班高峰',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'Subways are extremely crowded during morning rush hour.',
+    exampleTranslation: '捷運在早晨尖峰時段非常擁擠。',
+    tip: '避開早上 7:30~9:00 與下午 5:00~7:00 行程會更舒適。'
+  },
+  {
+    id: 'vocab-52',
+    word: 'car rental',
+    phonetic: '/kɑːr ˈrentl/',
+    partOfSpeech: 'n.',
+    translation: '租車服務 / 租車公司',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'We booked a compact car through the airport car rental agency.',
+    exampleTranslation: '我們透過機場租車公司預訂了一輛小型車。',
+    tip: '國外自駕務必隨身攜帶國際駕照與台灣駕照正本。'
+  },
+  {
+    id: 'vocab-53',
+    word: 'intersection',
+    phonetic: '/ˌɪntərˈsekʃn/',
+    partOfSpeech: 'n.',
+    translation: '十字路口 / 交叉路口',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'Turn right at the next major intersection after the gas station.',
+    exampleTranslation: '過了加油站後的下一個大十字路口右轉。',
+    tip: '英式常稱 crossroads 或 junction。'
+  },
+  {
+    id: 'vocab-54',
+    word: 'detour',
+    phonetic: '/ˈdiːtʊr/',
+    partOfSpeech: 'n. / v.',
+    translation: '繞道 / 臨時改道',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'Due to road construction, all traffic must take a detour.',
+    exampleTranslation: '因道路施工，所有車輛必須繞道而行。',
+    tip: '路上看到黃色 DETOUR 標誌代表前方封路需依箭頭改道。'
+  },
+
+  // ==========================================
+  // --- 6. 生活常用口語 (Daily Chitchat & Slang) ---
+  // ==========================================
+  {
+    id: 'vocab-55',
     word: 'No worries',
     phonetic: '/noʊ ˈwɜːriz/',
     partOfSpeech: 'phr.',
@@ -325,7 +685,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '在美澳非常流行，比正式的 "You are welcome" 更親切隨和。'
   },
   {
-    id: 'vocab-27',
+    id: 'vocab-56',
     word: 'under the weather',
     phonetic: '/ˈʌndər ðə ˈweðər/',
     partOfSpeech: 'idiom',
@@ -337,7 +697,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '常用於描述輕微感冒、疲倦，而非重大重病。'
   },
   {
-    id: 'vocab-28',
+    id: 'vocab-57',
     word: 'Catch you later',
     phonetic: '/kætʃ juː ˈleɪtər/',
     partOfSpeech: 'phr.',
@@ -349,7 +709,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '道別時很自然、充滿活力的常用口語。'
   },
   {
-    id: 'vocab-29',
+    id: 'vocab-58',
     word: "I'm in",
     phonetic: '/aɪm ɪn/',
     partOfSpeech: 'phr.',
@@ -361,7 +721,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '若不想參加則可說 "Count me out" 或 "I will pass this time"。'
   },
   {
-    id: 'vocab-30',
+    id: 'vocab-59',
     word: 'Hit me up',
     phonetic: '/hɪt miː ʌp/',
     partOfSpeech: 'phr.',
@@ -372,22 +732,84 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     exampleTranslation: '這週末你一到市區就傳訊息跟我聯絡吧。',
     tip: '社交軟體常簡寫為 HMU。'
   },
-
-  // --- 緊急求助與醫療 (Emergency & Health) ---
   {
-    id: 'vocab-31',
+    id: 'vocab-60',
+    word: "It's on me",
+    phonetic: '/ɪts ɑːn miː/',
+    partOfSpeech: 'phr.',
+    translation: '這餐由我請客！我買單！',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Put your wallet away, lunch today is on me!',
+    exampleTranslation: '把錢包收起來，今天的午餐我請客！',
+    tip: '也可以說 "It\'s my treat."。'
+  },
+  {
+    id: 'vocab-61',
+    word: 'Take your time',
+    phonetic: '/teɪk jʊr taɪm/',
+    partOfSpeech: 'phr.',
+    translation: '慢慢來，不用著急',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Take your time looking around the store; we are in no hurry.',
+    exampleTranslation: '你慢慢逛這間店，我們完全不趕時間。',
+    tip: '外國朋友挑東西或整理行李時，說這句會給人非常貼心的印象。'
+  },
+  {
+    id: 'vocab-62',
+    word: 'Call it a day',
+    phonetic: '/kɔːl ɪt ə deɪ/',
+    partOfSpeech: 'idiom',
+    translation: '今天就到此為止 / 收工結束',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'We have walked over 20,000 steps. Let\'s call it a day and head back.',
+    exampleTranslation: '我們今天已經走了兩萬多步，今天就到此為止回飯店吧。',
+    tip: '工作或旅遊景點逛完時最道地的收尾句。'
+  },
+  {
+    id: 'vocab-63',
+    word: 'On the same page',
+    phonetic: '/ɑːn ðə seɪm peɪdʒ/',
+    partOfSpeech: 'phr.',
+    translation: '想法一致 / 達成共識',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Let\'s make sure we are all on the same page regarding tomorrow\'s itinerary.',
+    exampleTranslation: '讓我們先確認大家對明天的行程規劃都有共識。',
+    tip: '出遊討論行程或會議確認時極高頻。'
+  },
+  {
+    id: 'vocab-64',
+    word: 'That makes sense',
+    phonetic: '/ðæt meɪks sens/',
+    partOfSpeech: 'phr.',
+    translation: '有道理 / 說得通 / 我懂了',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Ah, taking the subway is faster during rush hour? That makes sense.',
+    exampleTranslation: '啊，尖峰時段搭地鐵比較快？這很有道理。',
+    tip: '對外國人的解釋或建議表示認同與理解的最佳口語。'
+  },
+
+  // ==========================================
+  // --- 7. 緊急求助與醫療 (Emergency & Health) ---
+  // ==========================================
+  {
+    id: 'vocab-65',
     word: 'prescription',
     phonetic: '/prɪˈskrɪpʃn/',
     partOfSpeech: 'n.',
-    translation: '處方籤 / 處方藥',
+    translation: '醫師處方箋 / 處方藥',
     category: 'emergency',
     categoryLabel: '緊急與醫療',
     example: 'You will need a doctor\'s prescription to buy this antibiotic.',
-    exampleTranslation: '您需要醫師處方籤才能購買這種抗生素。',
+    exampleTranslation: '您需要醫師處方箋才能購買這種抗生素。',
     tip: '成藥（非處方藥）則稱為 Over-The-Counter (OTC) medicine。'
   },
   {
-    id: 'vocab-32',
+    id: 'vocab-66',
     word: 'lost and found',
     phonetic: '/lɔːst ænd faʊnd/',
     partOfSpeech: 'n.',
@@ -399,7 +821,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '遺失物品時請儘速至車站或景點的 Lost & Found 登記。'
   },
   {
-    id: 'vocab-33',
+    id: 'vocab-67',
     word: 'painkiller',
     phonetic: '/ˈpeɪnkɪlər/',
     partOfSpeech: 'n.',
@@ -411,7 +833,7 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     tip: '國外藥局常見的止痛成份有 Ibuprofen (布洛芬) 與 Acetaminophen。'
   },
   {
-    id: 'vocab-34',
+    id: 'vocab-68',
     word: 'emergency exit',
     phonetic: '/ɪˈmɜːrdʒənsi ˈeɡzɪt/',
     partOfSpeech: 'n.',
@@ -421,5 +843,389 @@ export const INITIAL_VOCABULARY: WordItem[] = [
     example: 'Please locate the nearest emergency exit as soon as you enter.',
     exampleTranslation: '一進入場所後，請先確認距離最近的緊急逃生出口位置。',
     tip: '飛機就座時也請留意自身與緊急逃生門的距離。'
+  },
+  {
+    id: 'vocab-69',
+    word: 'ambulance',
+    phonetic: '/ˈæmbjələns/',
+    partOfSpeech: 'n.',
+    translation: '救護車',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'Please call an ambulance immediately! Someone has fainted.',
+    exampleTranslation: '請立即叫救護車！有人昏倒了。',
+    tip: '美國撥打 911，英國撥打 999，歐盟大部分國家撥打 112。'
+  },
+  {
+    id: 'vocab-70',
+    word: 'embassy',
+    phonetic: '/ˈembəsi/',
+    partOfSpeech: 'n.',
+    translation: '大使館 / 領事館 / 辦事處',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'If your passport is stolen, report it to the nearest embassy right away.',
+    exampleTranslation: '如果護照被偷，請立即向距離最近的大使館或代表處報案。',
+    tip: '出國前先將外交部旅外國人急難救助電話存入手機。'
+  },
+  {
+    id: 'vocab-71',
+    word: 'pickpocket',
+    phonetic: '/ˈpɪkpɑːkɪt/',
+    partOfSpeech: 'n. / v.',
+    translation: '扒手 / 扒竊',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'Beware of pickpockets in crowded tourist attractions and subway stations.',
+    exampleTranslation: '在擁擠的觀光景點和地鐵站內請當心扒手。',
+    tip: '包包務必背在胸前，貴重物品勿放後口袋。'
+  },
+  {
+    id: 'vocab-72',
+    word: 'police report',
+    phonetic: '/pəˈliːs rɪˈpɔːrt/',
+    partOfSpeech: 'n.',
+    translation: '報案三聯單 / 警察報案證明',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'I need a copy of the police report for my travel insurance claim.',
+    exampleTranslation: '我需要一份報案紀錄副本，用以申請旅遊平安險理賠。',
+    tip: '申請旅行不便險或遺失理賠時，警察報案紀錄是必備文件。'
+  },
+  {
+    id: 'vocab-73',
+    word: 'bandage',
+    phonetic: '/ˈbændɪdʒ/',
+    partOfSpeech: 'n.',
+    translation: '繃帶 / OK 繃',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'I scraped my knee; could you give me an adhesive bandage?',
+    exampleTranslation: '我擦傷了膝蓋，可以給我一個 OK 繃嗎？',
+    tip: 'OK 繃在美式英文中也常以知名品牌 Band-Aid 代稱。'
+  },
+  {
+    id: 'vocab-74',
+    word: 'stomachache',
+    phonetic: '/ˈstʌməkeɪk/',
+    partOfSpeech: 'n.',
+    translation: '胃痛 / 肚子痛',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'I have had a severe stomachache since eating dinner yesterday.',
+    exampleTranslation: '自從昨天吃過晚餐後，我肚子就一直劇烈疼痛。',
+    tip: '去藥局買胃藥時，說 "I have a stomachache" 藥師就能理解。'
+  },
+  {
+    id: 'vocab-75',
+    word: 'boarding gate',
+    phonetic: '/ˈbɔːrdɪŋ ɡeɪt/',
+    partOfSpeech: 'n.',
+    translation: '登機門',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'Please proceed to Boarding Gate 28 immediately.',
+    exampleTranslation: '請立即前往第 28 號登機門。',
+    tip: '大機場各登機門距離遙遠，過海關後務必先確認登機門位置。'
+  },
+  {
+    id: 'vocab-76',
+    word: 'currency exchange',
+    phonetic: '/ˈkɜːrənsi ɪksˈtʃeɪndʒ/',
+    partOfSpeech: 'n.',
+    translation: '外幣兌換處 / 換匯櫃台',
+    category: 'airport',
+    categoryLabel: '機場與飛行',
+    example: 'Is there a currency exchange counter near the arrival hall?',
+    exampleTranslation: '請問入境大廳附近有外幣兌換櫃台嗎？',
+    tip: '市區換匯通常匯率比機場好，在機場換足夠搭車即可。'
+  },
+  {
+    id: 'vocab-77',
+    word: 'eSIM / SIM card',
+    phonetic: '/ˌiː ˈsɪm kɑːrd/',
+    partOfSpeech: 'n.',
+    translation: '上網卡 / 虛擬 SIM 卡',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'I activated an international travel eSIM on my phone before landing.',
+    exampleTranslation: '我在飛機降落前就啟用了手機上的國際漫遊虛擬 eSIM 上網卡。',
+    tip: '現代出國首選 eSIM，不用拔卡換卡，出發前掃 QR code 即可。'
+  },
+  {
+    id: 'vocab-78',
+    word: 'power bank',
+    phonetic: '/ˈpaʊər bæŋk/',
+    partOfSpeech: 'n.',
+    translation: '行動電源 / 行動充電寶',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Power banks must be kept in carry-on baggage and cannot be checked.',
+    exampleTranslation: '行動電源必須放在隨身手提行李中，嚴禁放入託運行李。',
+    tip: '國際航空嚴格規定行動電源不可託運，否則會被海關沒收。'
+  },
+  {
+    id: 'vocab-79',
+    word: 'no-show',
+    phonetic: '/ˈnoʊ ʃoʊ/',
+    partOfSpeech: 'n.',
+    translation: '預約未到 / 放鳥缺席',
+    category: 'hotel',
+    categoryLabel: '飯店與住宿',
+    example: 'If you are a no-show, the hotel will charge the full first night rate.',
+    exampleTranslation: '如果您預訂後未出現且未取消，飯店將扣取第一晚的全額房費。',
+    tip: '無法前往時務必提前發信或打電話取消，避免被收 no-show fee。'
+  },
+  {
+    id: 'vocab-80',
+    word: 'front desk',
+    phonetic: '/frʌnt desk/',
+    partOfSpeech: 'n.',
+    translation: '飯店櫃台 / 服務接待處',
+    category: 'hotel',
+    categoryLabel: '飯店與住宿',
+    example: 'You can dial 0 on your room phone to connect to the front desk.',
+    exampleTranslation: '您可以按房間電話的 0 號直接連線到飯店總櫃台。',
+    tip: '詢問借用吹風機、熨斗或叫計程車都可以聯絡 front desk。'
+  },
+  {
+    id: 'vocab-81',
+    word: 'beverage',
+    phonetic: '/ˈbevərɪdʒ/',
+    partOfSpeech: 'n.',
+    translation: '飲料 / 飲品',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'Would you like to order any alcoholic or soft beverages?',
+    exampleTranslation: '請問您需要點任何酒精或無酒精飲料嗎？',
+    tip: '可樂雪碧等無酒精飲料英文稱為 soft drinks 或 non-alcoholic beverages。'
+  },
+  {
+    id: 'vocab-82',
+    word: 'appetizer',
+    phonetic: '/ˈæpɪtaɪzər/',
+    partOfSpeech: 'n.',
+    translation: '開胃前菜',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'We would like to start with the garlic bread as an appetizer.',
+    exampleTranslation: '我們想先點大蒜麵包當作開胃前菜。',
+    tip: '英式常用 starter 代替 appetizer。'
+  },
+  {
+    id: 'vocab-83',
+    word: 'dessert',
+    phonetic: '/dɪˈzɜːrt/',
+    partOfSpeech: 'n.',
+    translation: '餐後甜點',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'Could we see the dessert menu, please?',
+    exampleTranslation: '可以麻煩拿甜點菜單給我們看一下嗎？',
+    tip: '注意發音是重音在後 /dɪˈzɜːrt/，一個 s 的 desert /ˈdezərt/ 則是沙漠。'
+  },
+  {
+    id: 'vocab-84',
+    word: 'doggy bag',
+    phonetic: '/ˈdɔːɡi bæɡ/',
+    partOfSpeech: 'n.',
+    translation: '剩菜打包袋 / 外帶盒',
+    category: 'dining',
+    categoryLabel: '餐廳與美食',
+    example: 'Could I get a doggy bag for the leftover pizza?',
+    exampleTranslation: '可以給我一個外帶盒打包剩下的披薩嗎？',
+    tip: '也可以禮貌地說 "Could I have a to-go box for this?"。'
+  },
+  {
+    id: 'vocab-85',
+    word: 'window shopping',
+    phonetic: '/ˈwɪndoʊ ˈʃɑːpɪŋ/',
+    partOfSpeech: 'n.',
+    translation: '只看不買 / 純逛街賞櫥窗',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'We had an hour to kill, so we did some window shopping on 5th Avenue.',
+    exampleTranslation: '我們有一個小時的空檔，所以在第五大道隨意逛櫥窗打發時間。',
+    tip: '店員詢問 "Can I help you?" 時可禮貌回 "I\'m just browsing, thank you!"。'
+  },
+  {
+    id: 'vocab-86',
+    word: 'price tag',
+    phonetic: '/praɪs tæɡ/',
+    partOfSpeech: 'n.',
+    translation: '標價標籤',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'Excuse me, there is no price tag on this sweater. How much is it?',
+    exampleTranslation: '不好意思，這件毛衣上沒有標價吊牌，請問多少錢？',
+    tip: '很多國外標價不含消費稅 (VAT / Sales Tax)，結帳時會再加稅。'
+  },
+  {
+    id: 'vocab-87',
+    word: 'sold out',
+    phonetic: '/soʊld aʊt/',
+    partOfSpeech: 'adj. phr.',
+    translation: '售罄 / 全數賣完',
+    category: 'shopping',
+    categoryLabel: '購物與退稅',
+    example: 'Tickets for tonight\'s Broadway musical are completely sold out.',
+    exampleTranslation: '今晚百老匯音樂劇的門票已經全數售罄。',
+    tip: '商品售完也常掛上 "Sold Out" 的標籤牌。'
+  },
+  {
+    id: 'vocab-88',
+    word: 'roundabout',
+    phonetic: '/ˈraʊndəbaʊt/',
+    partOfSpeech: 'n.',
+    translation: '環島 / 圓環 (交通路口)',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'Take the second exit at the roundabout toward the city center.',
+    exampleTranslation: '請在圓環的第二個出口駛出，往市中心方向行駛。',
+    tip: '在歐陸或英國自駕時非常多圓環，進圓環前必須禮讓環內車輛。'
+  },
+  {
+    id: 'vocab-89',
+    word: 'expressway',
+    phonetic: '/ɪkˈspresweɪ/',
+    partOfSpeech: 'n.',
+    translation: '快速道路 / 高速公路',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'Taking the expressway will save us about thirty minutes of driving.',
+    exampleTranslation: '走快速道路能替我們省下大約三十分鐘的車程。',
+    tip: '各國稱呼不同：美國常稱 highway 或 freeway，英國稱為 motorway。'
+  },
+  {
+    id: 'vocab-90',
+    word: 'transit pass',
+    phonetic: '/ˈtrænzɪt pæs/',
+    partOfSpeech: 'n.',
+    translation: '交通卡 / 一日交通通票',
+    category: 'transport',
+    categoryLabel: '交通與指路',
+    example: 'A 3-day unlimited transit pass covers both subway and bus rides.',
+    exampleTranslation: '這張三日無限搭乘交通通票涵蓋了地鐵與公車車資。',
+    tip: '自由行買 24 小時或 72 小時一日券通常非常划算。'
+  },
+  {
+    id: 'vocab-91',
+    word: 'Hang out',
+    phonetic: '/hæŋ aʊt/',
+    partOfSpeech: 'phr. v.',
+    translation: '出去聚聚 / 鬼混閒逛',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Do you want to hang out at the beach cafe this afternoon?',
+    exampleTranslation: '今天下午你想一起去海灘旁的咖啡廳聚聚放鬆嗎？',
+    tip: '和朋友相約出門時最自然、最常說的動詞片語。'
+  },
+  {
+    id: 'vocab-92',
+    word: 'Sleep on it',
+    phonetic: '/sliːp ɑːn ɪt/',
+    partOfSpeech: 'idiom',
+    translation: '考慮一晚再做決定',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Don\'t make a hasty purchase. Sleep on it and decide tomorrow.',
+    exampleTranslation: '先別衝動消費，考慮一晚想想看，明天再決定吧。',
+    tip: '面對重大抉擇或大筆購物猶豫不決時常用。'
+  },
+  {
+    id: 'vocab-93',
+    word: 'Hands down',
+    phonetic: '/hændz daʊn/',
+    partOfSpeech: 'idiom',
+    translation: '毫無疑問地 / 肯定是第一名',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'That was hands down the most delicious ramen I have ever tasted.',
+    exampleTranslation: '那毫無疑問是我吃過最美味無比的拉麵。',
+    tip: '用來強力強調某物絕對是第一名。'
+  },
+  {
+    id: 'vocab-94',
+    word: 'Keep in touch',
+    phonetic: '/kiːp ɪn tʌtʃ/',
+    partOfSpeech: 'phr.',
+    translation: '保持聯絡',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'It was wonderful meeting you on this tour. Let\'s keep in touch!',
+    exampleTranslation: '在這次旅程中認識你真開心，我們一定要保持聯絡喔！',
+    tip: '旅途中與新認識的朋友道別交換 IG 或電話時必說。'
+  },
+  {
+    id: 'vocab-95',
+    word: 'clinic',
+    phonetic: '/ˈklɪnɪk/',
+    partOfSpeech: 'n.',
+    translation: '診所',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'Is there a walk-in medical clinic nearby that accepts tourists?',
+    exampleTranslation: '請問附近有接受外國觀光客且免預約的看診診所嗎？',
+    tip: '不用預約即可直接現場掛號的診所稱為 walk-in clinic。'
+  },
+  {
+    id: 'vocab-96',
+    word: 'food poisoning',
+    phonetic: '/fuːd ˈpɔɪzənɪŋ/',
+    partOfSpeech: 'n.',
+    translation: '食物中毒',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'I suspect I might have food poisoning from the street seafood.',
+    exampleTranslation: '我懷疑我可能因為吃了路邊海鮮而引發食物中毒。',
+    tip: '出國出現嚴重腹瀉、嘔吐時向醫師陳述的關鍵詞彙。'
+  },
+  {
+    id: 'vocab-97',
+    word: 'first aid kit',
+    phonetic: '/fɜːrst eɪd kɪt/',
+    partOfSpeech: 'n.',
+    translation: '急救箱 / 急救醫藥包',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'Does the hotel front desk have a basic first aid kit with disinfectant?',
+    exampleTranslation: '飯店櫃台有配備消毒藥水的基礎急救藥箱嗎？',
+    tip: '飯店、遊覽車、登山客棧一般都會備有急救箱。'
+  },
+  {
+    id: 'vocab-98',
+    word: 'sunscreen',
+    phonetic: '/ˈsʌnskriːn/',
+    partOfSpeech: 'n.',
+    translation: '防曬乳 / 防曬霜',
+    category: 'daily',
+    categoryLabel: '日常口語',
+    example: 'Make sure to apply water-resistant sunscreen before swimming.',
+    exampleTranslation: '游泳前務必塗抹具防水功能的防曬乳。',
+    tip: '熱帶海島旅遊必備，許多海島嚴格要求使用海洋友善防曬 (reef-safe sunscreen)。'
+  },
+  {
+    id: 'vocab-99',
+    word: 'insect repellent',
+    phonetic: '/ˈɪnsekt rɪˈpelənt/',
+    partOfSpeech: 'n.',
+    translation: '防蚊液 / 驅蟲噴霧',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'You will need some mosquito repellent if you go jungle hiking.',
+    exampleTranslation: '如果您要去叢林健行，務必要準備一些防蚊噴霧。',
+    tip: '東南亞或熱帶國家藥局常見 DEET 成份的強效防蚊液。'
+  },
+  {
+    id: 'vocab-100',
+    word: 'sprain',
+    phonetic: '/spreɪn/',
+    partOfSpeech: 'v. / n.',
+    translation: '扭傷 (關節/腳踝)',
+    category: 'emergency',
+    categoryLabel: '緊急與醫療',
+    example: 'I accidentally twisted my foot on the stairs and sprained my ankle.',
+    exampleTranslation: '我不小心在樓梯踩空扭到了腳，腳踝扭傷了。',
+    tip: '扭傷時急救原則是 RICE：休息 (Rest)、冰敷 (Ice)、加壓 (Compression)、抬高 (Elevation)。'
   }
 ];

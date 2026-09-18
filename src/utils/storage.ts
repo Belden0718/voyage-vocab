@@ -54,6 +54,14 @@ export const getCustomWords = (): WordItem[] => {
   }
 };
 
+export const setCustomWords = (words: WordItem[]) => {
+  localStorage.setItem(STORAGE_KEYS.CUSTOM_VOCAB, JSON.stringify(words));
+};
+
+export const setWordProgressMap = (progressMap: Record<string, UserWordProgress>) => {
+  localStorage.setItem(STORAGE_KEYS.VOCAB_PROGRESS, JSON.stringify(progressMap));
+};
+
 // 取得所有單字的學習進度 Map
 export const getWordProgressMap = (): Record<string, UserWordProgress> => {
   try {

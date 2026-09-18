@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { WordItem, UserWordProgress, CategoryType, UserStats } from './types';
 import { 
   getAllWords, getWordProgressMap, recordWordReview, toggleStarWord, 
   getUserStats, saveCustomWord, getAppSettings, 
-  saveAppSettings 
+  saveAppSettings, setCustomWords, setWordProgressMap, getCustomWords
 } from './utils/storage';
 import type { AppSettings } from './utils/storage';
+import { isFirebaseConfigured } from './services/firebase';
+import { 
+  subscribeAuthChange, uploadDataToCloud, 
+  fetchCloudData, subscribeCloudData 
+} from './services/syncService';
+import type { User } from 'firebase/auth';
 import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
 import type { TabType } from './components/BottomNav';
@@ -25,8 +31,13 @@ export const App: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>(getAppSettings());
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'all'>('all');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  
+  // Firebase 狀態
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const isCloudReady = isFirebaseConfigured();
+  const isSyncingFromCloud = useRef(false);
 
-  // 初始化資料載入
+  // 初始化本地資料載入
   useEffect(() => {
     const loadedWords = getAllWords();
     setWords(loadedWords);
@@ -35,11 +46,97 @@ export const App: React.FC = () => {
     setSettings(getAppSettings());
   }, []);
 
+  // 監聽 Firebase 登入與即時雲端同步
+  useEffect(() => {
+    const unsubscribeAuth = subscribeAuthChange(async (user) => {
+      setCurrentUser(user);
+      if (user) {
+        // 從雲端抓取初次資料
+        try {
+          const cloudData = await fetchCloudData(user);
+          if (cloudData) {
+            isSyncingFromCloud.current = true;
+            if (cloudData.customWords) {
+              // 合併本地與雲端自訂單字
+              const localCustom = getCustomWords();
+              const existingIds = new Set(localCustom.map(w => w.id));
+              const mergedCustom = [...localCustom];
+              cloudData.customWords.forEach(w => {
+                if (!existingIds.has(w.id)) {
+                  mergedCustom.push(w);
+                }
+              });
+              setCustomWords(mergedCustom);
+              setWords(getAllWords());
+            }
+            if (cloudData.progressMap) {
+              const mergedProgress = { ...getWordProgressMap(), ...cloudData.progressMap };
+              setWordProgressMap(mergedProgress);
+              setProgressMap(mergedProgress);
+            }
+            if (cloudData.stats) {
+              setStats(cloudData.stats);
+            }
+            setTimeout(() => { isSyncingFromCloud.current = false; }, 500);
+          } else {
+            // 雲端尚未有資料，將本地資料第一次上傳
+            uploadDataToCloud(user, {
+              customWords: getCustomWords(),
+              progressMap: getWordProgressMap(),
+              stats: getUserStats(),
+              updatedAt: Date.now(),
+            });
+          }
+        } catch (e) {
+          console.error('Fetch cloud data error:', e);
+        }
+
+        // 即時監聽其他裝置的異動
+        const unsubscribeCloud = subscribeCloudData(user, (newData) => {
+          if (isSyncingFromCloud.current) return;
+          if (newData.customWords) {
+            setCustomWords(newData.customWords);
+            setWords(getAllWords());
+          }
+          if (newData.progressMap) {
+            setWordProgressMap(newData.progressMap);
+            setProgressMap(newData.progressMap);
+          }
+        });
+
+        return () => {
+          unsubscribeCloud();
+        };
+      }
+    });
+
+    return () => {
+      unsubscribeAuth();
+    };
+  }, []);
+
+  // 輔助：自動同步至雲端
+  const syncToCloudIfLoggedIn = (
+    updatedProgress?: Record<string, UserWordProgress>,
+    updatedWords?: WordItem[]
+  ) => {
+    if (currentUser && !isSyncingFromCloud.current) {
+      uploadDataToCloud(currentUser, {
+        customWords: (updatedWords || words).filter(w => w.id.startsWith('custom-')),
+        progressMap: updatedProgress || progressMap,
+        stats: getUserStats(),
+        updatedAt: Date.now(),
+      });
+    }
+  };
+
   // 處理單字 SRS 評分
   const handleReviewWord = (wordId: string, rating: 'again' | 'hard' | 'good' | 'easy') => {
     const updated = recordWordReview(wordId, rating);
-    setProgressMap(prev => ({ ...prev, [wordId]: updated }));
+    const nextMap = { ...progressMap, [wordId]: updated };
+    setProgressMap(nextMap);
     setStats(getUserStats());
+    syncToCloudIfLoggedIn(nextMap);
   };
 
   // 處理星標切換
@@ -48,14 +145,18 @@ export const App: React.FC = () => {
     setProgressMap(prev => {
       const cur = prev[wordId];
       if (!cur) return prev;
-      return { ...prev, [wordId]: { ...cur, isStarred } };
+      const nextMap = { ...prev, [wordId]: { ...cur, isStarred } };
+      syncToCloudIfLoggedIn(nextMap);
+      return nextMap;
     });
   };
 
   // 新增自訂單字
   const handleAddCustomWord = (newWordData: Omit<WordItem, 'id'>) => {
     const created = saveCustomWord(newWordData);
-    setWords(prev => [created, ...prev]);
+    const nextWords = [created, ...words];
+    setWords(nextWords);
+    syncToCloudIfLoggedIn(undefined, nextWords);
   };
 
   // 測驗結果反饋
@@ -101,6 +202,7 @@ export const App: React.FC = () => {
           localStorage.setItem('voyage_vocab_custom_v1', JSON.stringify(parsed.customWords));
           setWords(getAllWords());
         }
+        syncToCloudIfLoggedIn(parsed.progressMap, getAllWords());
         alert('備份資料匯入成功！');
       } catch (err) {
         alert('匯入失敗：檔案格式不相符');
@@ -121,6 +223,8 @@ export const App: React.FC = () => {
         {/* 頂部功能列 */}
         <Navbar
           stats={stats}
+          currentUser={currentUser}
+          isCloudReady={isCloudReady}
           onOpenSettings={() => setIsSettingsOpen(true)}
         />
 
@@ -180,10 +284,11 @@ export const App: React.FC = () => {
           starredCount={starredCount}
         />
 
-        {/* 設定彈窗 */}
+        {/* 設定與雲端登入彈窗 */}
         <SettingsModal
           isOpen={isSettingsOpen}
           settings={settings}
+          currentUser={currentUser}
           onClose={() => setIsSettingsOpen(false)}
           onUpdateSettings={handleUpdateSettings}
         />

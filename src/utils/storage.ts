@@ -60,6 +60,32 @@ export const setCustomWords = (words: WordItem[]) => {
   localStorage.setItem(STORAGE_KEYS.CUSTOM_VOCAB, JSON.stringify(words));
 };
 
+// 更新自訂單字
+export const updateCustomWord = (word: WordItem): WordItem[] => {
+  const allCustom = getCustomWords();
+  const updated = allCustom.map(w => (w.id === word.id ? word : w));
+  localStorage.setItem(STORAGE_KEYS.CUSTOM_VOCAB, JSON.stringify(updated));
+  return updated;
+};
+
+// 刪除自訂單字
+export const deleteCustomWord = (wordId: string): WordItem[] => {
+  const allCustom = getCustomWords();
+  const updated = allCustom.filter(w => w.id !== wordId);
+  localStorage.setItem(STORAGE_KEYS.CUSTOM_VOCAB, JSON.stringify(updated));
+  return updated;
+};
+
+// 刪除單字進度記錄
+export const removeWordProgress = (wordId: string): Record<string, UserWordProgress> => {
+  const map = getWordProgressMap();
+  if (map[wordId]) {
+    delete map[wordId];
+    setWordProgressMap(map);
+  }
+  return map;
+};
+
 // 舊版單字 ID 映射表 (用於平滑升級用戶歷史進度)
 const LEGACY_ID_MAP: Record<string, string> = {
   'vocab-1': 'boarding pass',

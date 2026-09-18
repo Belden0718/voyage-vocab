@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { WordItem, UserWordProgress, CategoryType, UserStats } from './types';
 import { 
   getAllWords, getWordProgressMap, recordWordReview, toggleStarWord, 
-  getUserStats, saveCustomWord, getAppSettings, 
+  getUserStats, saveCustomWord, updateCustomWord, deleteCustomWord, 
+  removeWordProgress, getAppSettings, 
   saveAppSettings, setCustomWords, setWordProgressMap, getCustomWords,
   recordQuizCompletedStats, saveUserStats
 } from './utils/storage';
@@ -203,6 +204,26 @@ export const App: React.FC = () => {
     syncToCloudIfLoggedIn(undefined, nextWords);
   };
 
+  // 編輯更新自訂單字
+  const handleUpdateCustomWord = (updatedWord: WordItem) => {
+    updateCustomWord(updatedWord);
+    const nextWords = words.map(w => (w.id === updatedWord.id ? updatedWord : w));
+    setWords(nextWords);
+    syncToCloudIfLoggedIn(undefined, nextWords);
+  };
+
+  // 刪除自訂單字
+  const handleDeleteCustomWord = (wordId: string) => {
+    deleteCustomWord(wordId);
+    const nextWords = words.filter(w => w.id !== wordId);
+    const nextProgress = { ...progressMap };
+    delete nextProgress[wordId];
+    removeWordProgress(wordId);
+    setWords(nextWords);
+    setProgressMap(nextProgress);
+    syncToCloudIfLoggedIn(nextProgress, nextWords);
+  };
+
   // 測驗結果即時反饋
   const handleQuizResult = (wordId: string, isCorrect: boolean) => {
     handleReviewWord(wordId, isCorrect ? 'good' : 'again');
@@ -342,6 +363,8 @@ export const App: React.FC = () => {
               settings={settings}
               onToggleStar={handleToggleStar}
               onAddCustomWord={handleAddCustomWord}
+              onUpdateCustomWord={handleUpdateCustomWord}
+              onDeleteCustomWord={handleDeleteCustomWord}
               onExportData={handleExportData}
               onImportData={handleImportData}
             />

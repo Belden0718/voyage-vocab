@@ -5,7 +5,7 @@ import { speakText, triggerHaptic, getPhoneticInfo } from '../utils/speech';
 import { CountryFlag } from './CountryFlag';
 import { 
   Search, Star, Plus, Volume2, CheckCircle, Clock, 
-  Download, Upload, X 
+  Download, Upload, X, Pencil, Trash2, Sparkles 
 } from 'lucide-react';
 
 interface WordListViewProps {
@@ -14,9 +14,29 @@ interface WordListViewProps {
   settings: AppSettings;
   onToggleStar: (wordId: string) => void;
   onAddCustomWord: (word: Omit<WordItem, 'id'>) => void;
+  onUpdateCustomWord?: (word: WordItem) => void;
+  onDeleteCustomWord?: (wordId: string) => void;
   onExportData: () => void;
   onImportData: (file: File) => void;
 }
+
+const CATEGORIES: { key: CategoryType; label: string; icon: string }[] = [
+  { key: 'daily', label: '日常口語', icon: '💬' },
+  { key: 'social', label: '社交破冰', icon: '🤝' },
+  { key: 'dining', label: '餐廳美食', icon: '🍽️' },
+  { key: 'hotel', label: '飯店住宿', icon: '🏨' },
+  { key: 'airport', label: '機場飛行', icon: '✈️' },
+  { key: 'transport', label: '交通指路', icon: '🚊' },
+  { key: 'shopping', label: '購物退稅', icon: '🛍️' },
+  { key: 'culture', label: '文化探索', icon: '🏛️' },
+  { key: 'digital', label: '數位通訊', icon: '📱' },
+  { key: 'service', label: '爭議酒吧', icon: '🍻' },
+  { key: 'emergency', label: '緊急醫療', icon: '🚨' },
+];
+
+const getCategoryLabel = (cat: CategoryType): string => {
+  return CATEGORIES.find(c => c.key === cat)?.label || '生活常用';
+};
 
 export const WordListView: React.FC<WordListViewProps> = ({
   words,
@@ -24,25 +44,31 @@ export const WordListView: React.FC<WordListViewProps> = ({
   settings,
   onToggleStar,
   onAddCustomWord,
+  onUpdateCustomWord,
+  onDeleteCustomWord,
   onExportData,
   onImportData,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterMode, setFilterMode] = useState<'all' | 'starred' | 'mastered' | 'learning'>('all');
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [filterMode, setFilterMode] = useState<'all' | 'custom' | 'starred' | 'mastered' | 'learning'>('all');
+  const [showModal, setShowModal] = useState(false);
+  const [editingWord, setEditingWord] = useState<WordItem | null>(null);
 
-  // 新增單字表單狀態
-  const [newWord, setNewWord] = useState('');
-  const [newPhonetic, setNewPhonetic] = useState('');
-  const [newPartOfSpeech, setNewPartOfSpeech] = useState('n.');
-  const [newTranslation, setNewTranslation] = useState('');
-  const [newCategory, setNewCategory] = useState<CategoryType>('daily');
-  const [newExample, setNewExample] = useState('');
-  const [newExampleTranslation, setNewExampleTranslation] = useState('');
-  const [newTip, setNewTip] = useState('');
+  // 表單狀態
+  const [formWord, setFormWord] = useState('');
+  const [formPhonetic, setFormPhonetic] = useState('');
+  const [formPartOfSpeech, setFormPartOfSpeech] = useState('phr.');
+  const [formTranslation, setFormTranslation] = useState('');
+  const [formCategory, setFormCategory] = useState<CategoryType>('daily');
+  const [formExample, setFormExample] = useState('');
+  const [formExampleTranslation, setFormExampleTranslation] = useState('');
+  const [formTip, setFormTip] = useState('');
+
+  const customWordsCount = words.filter(w => w.id.startsWith('custom-')).length;
 
   const filteredWords = words.filter(w => {
     const progress = progressMap[w.id];
+    if (filterMode === 'custom' && !w.id.startsWith('custom-')) return false;
     if (filterMode === 'starred' && !progress?.isStarred) return false;
     if (filterMode === 'mastered' && (!progress || progress.box < 2)) return false;
     if (filterMode === 'learning' && (!progress || progress.box !== 1)) return false;
@@ -61,30 +87,79 @@ export const WordListView: React.FC<WordListViewProps> = ({
     speakText(text, settings.speechRate, settings.speechLang);
   };
 
-  const handleCreateWord = (e: React.FormEvent) => {
+  const handleOpenAddModal = () => {
+    setEditingWord(null);
+    setFormWord('');
+    setFormPhonetic('');
+    setFormPartOfSpeech('phr.');
+    setFormTranslation('');
+    setFormCategory('daily');
+    setFormExample('');
+    setFormExampleTranslation('');
+    setFormTip('');
+    setShowModal(true);
+    triggerHaptic('medium');
+  };
+
+  const handleOpenEditModal = (item: WordItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingWord(item);
+    setFormWord(item.word);
+    setFormPhonetic(item.phonetic || '');
+    setFormPartOfSpeech(item.partOfSpeech || 'phr.');
+    setFormTranslation(item.translation || '');
+    setFormCategory(item.category || 'daily');
+    setFormExample(item.example || '');
+    setFormExampleTranslation(item.exampleTranslation || '');
+    setFormTip(item.tip || '');
+    setShowModal(true);
+    triggerHaptic('medium');
+  };
+
+  const handleDeleteWord = (item: WordItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerHaptic('warning');
+    if (window.confirm(`確定要刪除自訂生詞「${item.word}」嗎？刪除後無法復原。`)) {
+      onDeleteCustomWord?.(item.id);
+      triggerHaptic('success');
+    }
+  };
+
+  const handleSaveWord = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newWord.trim() || !newTranslation.trim()) return;
+    if (!formWord.trim() || !formTranslation.trim()) return;
 
-    onAddCustomWord({
-      word: newWord.trim(),
-      phonetic: newPhonetic.trim() || `/${newWord.toLowerCase()}/`,
-      partOfSpeech: newPartOfSpeech,
-      translation: newTranslation.trim(),
-      category: newCategory,
-      categoryLabel: newCategory === 'airport' ? '機場飛行' : newCategory === 'hotel' ? '飯店住宿' : newCategory === 'dining' ? '餐廳美食' : newCategory === 'shopping' ? '購物退稅' : newCategory === 'transport' ? '交通指路' : newCategory === 'daily' ? '日常口語' : '緊急醫療',
-      example: newExample.trim() || `I need to know how to use "${newWord}".`,
-      exampleTranslation: newExampleTranslation.trim() || `我需要知道如何使用「${newWord}」。`,
-      tip: newTip.trim() || undefined,
-    });
+    const label = getCategoryLabel(formCategory);
 
-    // 重設表單
-    setNewWord('');
-    setNewPhonetic('');
-    setNewTranslation('');
-    setNewExample('');
-    setNewExampleTranslation('');
-    setNewTip('');
-    setShowAddModal(false);
+    if (editingWord) {
+      onUpdateCustomWord?.({
+        ...editingWord,
+        word: formWord.trim(),
+        phonetic: formPhonetic.trim() || `/${formWord.toLowerCase()}/`,
+        partOfSpeech: formPartOfSpeech,
+        translation: formTranslation.trim(),
+        category: formCategory,
+        categoryLabel: label,
+        example: formExample.trim() || `I need to know how to use "${formWord}".`,
+        exampleTranslation: formExampleTranslation.trim() || `我需要知道如何使用「${formWord}」。`,
+        tip: formTip.trim() || undefined,
+      });
+    } else {
+      onAddCustomWord({
+        word: formWord.trim(),
+        phonetic: formPhonetic.trim() || `/${formWord.toLowerCase()}/`,
+        partOfSpeech: formPartOfSpeech,
+        translation: formTranslation.trim(),
+        category: formCategory,
+        categoryLabel: label,
+        example: formExample.trim() || `I need to know how to use "${formWord}".`,
+        exampleTranslation: formExampleTranslation.trim() || `我需要知道如何使用「${formWord}」。`,
+        tip: formTip.trim() || undefined,
+      });
+    }
+
+    setShowModal(false);
+    setEditingWord(null);
     triggerHaptic('success');
   };
 
@@ -112,10 +187,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
         </div>
 
         <button
-          onClick={() => {
-            triggerHaptic('medium');
-            setShowAddModal(true);
-          }}
+          onClick={handleOpenAddModal}
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-2.5 rounded-2xl shadow-md active:scale-95 transition-all shrink-0 flex items-center gap-1 text-xs"
         >
           <Plus className="w-4 h-4" />
@@ -135,6 +207,19 @@ export const WordListView: React.FC<WordListViewProps> = ({
         >
           全部 ({words.length})
         </button>
+        {customWordsCount > 0 && (
+          <button
+            onClick={() => setFilterMode('custom')}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+              filterMode === 'custom'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            自訂生詞 ({customWordsCount})
+          </button>
+        )}
         <button
           onClick={() => setFilterMode('starred')}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
@@ -181,13 +266,14 @@ export const WordListView: React.FC<WordListViewProps> = ({
             const progress = progressMap[item.id];
             const isStarred = progress?.isStarred;
             const box = progress?.box ?? 0;
+            const isCustom = item.id.startsWith('custom-');
 
             return (
               <div
                 key={item.id}
                 className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 min-w-0 pr-2">
                   <button
                     onClick={() => handleSpeak(item.word)}
                     className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-100 active:scale-95 transition-all shrink-0"
@@ -196,9 +282,9 @@ export const WordListView: React.FC<WordListViewProps> = ({
                     <Volume2 className="w-5 h-5" />
                   </button>
 
-                  <div>
-                    <div className="flex items-center space-x-1.5 flex-wrap gap-y-0.5">
-                      <span className="font-bold text-sm text-slate-800">{item.word}</span>
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
+                      <span className="font-bold text-sm text-slate-800 break-words">{item.word}</span>
                       <span className="text-[10px] font-mono text-slate-500 bg-slate-50 px-1.5 py-0.2 rounded border border-slate-100 flex items-center gap-1">
                         <CountryFlag code={getPhoneticInfo(item, settings.speechLang).countryCode} className="w-3 h-2 inline-block rounded-[1px] shadow-2xs border border-slate-200/60 shrink-0" />
                         <span>{getPhoneticInfo(item, settings.speechLang).phonetic}</span>
@@ -206,12 +292,17 @@ export const WordListView: React.FC<WordListViewProps> = ({
                       <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-1.5 py-0.2 rounded">
                         {item.partOfSpeech}
                       </span>
+                      {isCustom && (
+                        <span className="text-[9px] font-bold text-purple-600 bg-purple-50 border border-purple-200/70 px-1.5 py-0.2 rounded">
+                          自訂
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">{item.translation}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 truncate">{item.translation}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2 shrink-0">
+                <div className="flex items-center space-x-1.5 shrink-0">
                   {/* 熟悉度標籤 */}
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     box >= 2 
@@ -222,6 +313,28 @@ export const WordListView: React.FC<WordListViewProps> = ({
                   }`}>
                     {box >= 2 ? '精通' : box === 1 ? '熟悉' : '新詞'}
                   </span>
+
+                  {/* 自訂單字專屬操作：編輯與刪除 */}
+                  {isCustom && (
+                    <>
+                      <button
+                        onClick={(e) => handleOpenEditModal(item, e)}
+                        className="p-1.5 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                        title="編輯此生詞"
+                        aria-label="編輯此生詞"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteWord(item, e)}
+                        className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                        title="刪除此生詞"
+                        aria-label="刪除此生詞"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
 
                   <button
                     onClick={() => onToggleStar(item.id)}
@@ -263,33 +376,42 @@ export const WordListView: React.FC<WordListViewProps> = ({
         </label>
       </div>
 
-      {/* 新增單字彈窗 (Modal) */}
-      {showAddModal && (
+      {/* 新增 / 編輯單字彈窗 (Modal) */}
+      {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4 animate-scale-up text-slate-800 max-h-[90vh] overflow-y-auto no-scrollbar">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-bold text-base text-slate-900 flex items-center gap-1.5">
-                <Plus className="w-4 h-4 text-indigo-600" />
-                新增自訂生詞
+                {editingWord ? (
+                  <>
+                    <Pencil className="w-4 h-4 text-indigo-600" />
+                    編輯自訂生詞
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 text-indigo-600" />
+                    新增自訂生詞
+                  </>
+                )}
               </h3>
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => setShowModal(false)}
                 className="text-slate-400 hover:text-slate-600 p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateWord} className="space-y-3 text-xs">
+            <form onSubmit={handleSaveWord} className="space-y-3 text-xs">
               <div>
                 <label className="font-bold text-slate-700 block mb-1">英文單字 / 片語 *</label>
                 <input
                   type="text"
                   required
-                  value={newWord}
-                  onChange={(e) => setNewWord(e.target.value)}
-                  placeholder="例如：boarding pass, carry-on..."
-                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  value={formWord}
+                  onChange={(e) => setFormWord(e.target.value)}
+                  placeholder="例如：it turned out that, boarding pass..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 font-medium"
                 />
               </div>
 
@@ -297,23 +419,26 @@ export const WordListView: React.FC<WordListViewProps> = ({
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">詞性</label>
                   <select
-                    value={newPartOfSpeech}
-                    onChange={(e) => setNewPartOfSpeech(e.target.value)}
+                    value={formPartOfSpeech}
+                    onChange={(e) => setFormPartOfSpeech(e.target.value)}
                     className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white"
                   >
+                    <option value="phr.">片語 (phr.)</option>
+                    <option value="idiom">慣用語 (idiom)</option>
                     <option value="n.">名詞 (n.)</option>
                     <option value="v.">動詞 (v.)</option>
                     <option value="adj.">形容詞 (adj.)</option>
                     <option value="adv.">副詞 (adv.)</option>
-                    <option value="phr.">片語 (phr.)</option>
+                    <option value="conj.">連接詞 (conj.)</option>
+                    <option value="prep.">介系詞 (prep.)</option>
                   </select>
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">音標 (選填)</label>
                   <input
                     type="text"
-                    value={newPhonetic}
-                    onChange={(e) => setNewPhonetic(e.target.value)}
+                    value={formPhonetic}
+                    onChange={(e) => setFormPhonetic(e.target.value)}
                     placeholder="/.../"
                     className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 font-mono"
                   />
@@ -325,36 +450,34 @@ export const WordListView: React.FC<WordListViewProps> = ({
                 <input
                   type="text"
                   required
-                  value={newTranslation}
-                  onChange={(e) => setNewTranslation(e.target.value)}
-                  placeholder="例如：登機證、手提行李"
-                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  value={formTranslation}
+                  onChange={(e) => setFormTranslation(e.target.value)}
+                  placeholder="例如：結果證明、原來是..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 font-medium"
                 />
               </div>
 
               <div>
                 <label className="font-bold text-slate-700 block mb-1">所屬場景分類</label>
                 <select
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value as CategoryType)}
+                  value={formCategory}
+                  onChange={(e) => setFormCategory(e.target.value as CategoryType)}
                   className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white"
                 >
-                  <option value="airport">✈️ 機場出入境</option>
-                  <option value="hotel">🏨 飯店住宿</option>
-                  <option value="dining">🍽️ 餐廳美食</option>
-                  <option value="shopping">🛍️ 購物退稅</option>
-                  <option value="transport">🚊 交通指路</option>
-                  <option value="daily">💬 生活口語</option>
-                  <option value="emergency">🚨 緊急求助</option>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat.key} value={cat.key}>
+                      {cat.icon} {cat.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">例句 (選填)</label>
+                <label className="font-bold text-slate-700 block mb-1">實用例句 (選填)</label>
                 <textarea
                   rows={2}
-                  value={newExample}
-                  onChange={(e) => setNewExample(e.target.value)}
+                  value={formExample}
+                  onChange={(e) => setFormExample(e.target.value)}
                   placeholder="輸入實用英文例句..."
                   className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                 />
@@ -364,9 +487,20 @@ export const WordListView: React.FC<WordListViewProps> = ({
                 <label className="font-bold text-slate-700 block mb-1">例句中文翻譯 (選填)</label>
                 <input
                   type="text"
-                  value={newExampleTranslation}
-                  onChange={(e) => setNewExampleTranslation(e.target.value)}
-                  placeholder="例句繁中翻譯..."
+                  value={formExampleTranslation}
+                  onChange={(e) => setFormExampleTranslation(e.target.value)}
+                  placeholder="例句中文翻譯..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">學習小撇步 / 搭配用法 (選填)</label>
+                <input
+                  type="text"
+                  value={formTip}
+                  onChange={(e) => setFormTip(e.target.value)}
+                  placeholder="例如：常用於過去式，接 that 子句..."
                   className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                 />
               </div>
@@ -374,7 +508,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               <div className="pt-2 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => setShowModal(false)}
                   className="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl active:scale-98"
                 >
                   取消
@@ -383,7 +517,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
                   type="submit"
                   className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md active:scale-98"
                 >
-                  新增存檔
+                  {editingWord ? '儲存變更' : '新增存檔'}
                 </button>
               </div>
             </form>

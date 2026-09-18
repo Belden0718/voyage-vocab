@@ -9,6 +9,7 @@ import {
   Trophy, Volume2, CheckCircle2, XCircle, RotateCcw, ArrowRight, 
   Headphones, Sparkles, Award, Zap, VolumeX, SkipForward
 } from 'lucide-react';
+import { InteractiveSentence } from './InteractiveSentence';
 
 interface QuizResultSummary {
   expEarned: number;
@@ -642,7 +643,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   </button>
                 </div>
               </div>
-              <p className="text-slate-700 font-medium">{currentQ.word.example}</p>
+              <InteractiveSentence
+                sentence={currentQ.word.example}
+                translation={currentQ.word.exampleTranslation}
+                wordsPool={words}
+                speechRate={settings.speechRate}
+                speechLang={settings.speechLang}
+                className="text-slate-700 font-medium text-xs"
+              />
               <p className="text-slate-400 text-[11px]">{currentQ.word.exampleTranslation}</p>
               {currentQ.word.tip && (
                 <p className="text-amber-700 bg-amber-50/70 p-2 rounded-lg border border-amber-100 text-[11px]">

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { speakText, triggerHaptic, getPhoneticInfo } from '../utils/speech';
 import { CountryFlag } from './CountryFlag';
+import { InteractiveSentence } from './InteractiveSentence';
 
 interface FlashcardViewProps {
   words: WordItem[];
@@ -338,9 +339,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                   <Volume2 className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <p className="text-xs font-medium text-white/95 leading-relaxed">
-                "{currentWord?.example}"
-              </p>
+              <InteractiveSentence
+                sentence={currentWord?.example || ''}
+                translation={currentWord?.exampleTranslation}
+                wordsPool={words}
+                speechRate={settings.speechRate}
+                speechLang={settings.speechLang}
+                isDark={true}
+                className="text-xs font-medium text-white/95"
+              />
               <p className="text-xs text-slate-300 font-normal">
                 {currentWord?.exampleTranslation}
               </p>

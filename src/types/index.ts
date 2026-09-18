@@ -10,7 +10,8 @@ export type CategoryType =
 export interface WordItem {
   id: string;
   word: string;
-  phonetic: string;
+  phonetic: string; // 美式音標 (US IPA)
+  phoneticUk?: string; // 英式音標 (UK/AU IPA)
   partOfSpeech: string;
   translation: string;
   category: CategoryType;

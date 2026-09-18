@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { WordItem, UserWordProgress, CategoryType } from '../types';
 import type { AppSettings } from '../utils/storage';
-import { speakText, triggerHaptic } from '../utils/speech';
+import { speakText, triggerHaptic, getPhoneticInfo } from '../utils/speech';
 import { 
   Search, Star, Plus, Volume2, CheckCircle, Clock, 
   Download, Upload, X 
@@ -196,9 +196,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
                   </button>
 
                   <div>
-                    <div className="flex items-center space-x-1.5">
+                    <div className="flex items-center space-x-1.5 flex-wrap gap-y-0.5">
                       <span className="font-bold text-sm text-slate-800">{item.word}</span>
-                      <span className="text-[10px] font-mono text-slate-400">{item.phonetic}</span>
+                      <span className="text-[10px] font-mono text-slate-500 bg-slate-50 px-1.5 py-0.2 rounded border border-slate-100 flex items-center gap-0.5">
+                        <span className="text-[9px]">{getPhoneticInfo(item, settings.speechLang).flag}</span>
+                        <span>{getPhoneticInfo(item, settings.speechLang).phonetic}</span>
+                      </span>
                       <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-1.5 py-0.2 rounded">
                         {item.partOfSpeech}
                       </span>

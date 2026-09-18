@@ -1,3 +1,5 @@
+import type { WordItem } from '../types';
+
 // Web Speech API 文字轉語音輔助函式
 export const speakText = (text: string, rate: number = 0.9, lang: string = 'en-US') => {
   if (!('speechSynthesis' in window)) {
@@ -19,6 +21,34 @@ export const speakText = (text: string, rate: number = 0.9, lang: string = 'en-U
   }
 
   window.speechSynthesis.speak(utterance);
+};
+
+// 依當前腔調設定取得對應音標與國旗標籤
+export const getPhoneticInfo = (
+  word: WordItem,
+  speechLang: string = 'en-US'
+): { label: string; flag: string; phonetic: string; altLabel?: string; altPhonetic?: string } => {
+  const isUk = speechLang === 'en-GB';
+  const isAu = speechLang === 'en-AU';
+  const wantsUk = isUk || isAu;
+
+  if (wantsUk) {
+    return {
+      label: isAu ? 'AU/UK' : 'UK',
+      flag: isAu ? '🇦🇺' : '🇬🇧',
+      phonetic: word.phoneticUk || word.phonetic,
+      altLabel: 'US',
+      altPhonetic: word.phonetic,
+    };
+  }
+
+  return {
+    label: 'US',
+    flag: '🇺🇸',
+    phonetic: word.phonetic,
+    altLabel: word.phoneticUk ? 'UK' : undefined,
+    altPhonetic: word.phoneticUk,
+  };
 };
 
 // 手機觸覺震動回饋 (Haptic Feedback)

@@ -4,7 +4,7 @@ import type { AppSettings } from '../utils/storage';
 import { 
   Volume2, Star, RotateCw, ArrowLeft, ArrowRight, Lightbulb 
 } from 'lucide-react';
-import { speakText, triggerHaptic } from '../utils/speech';
+import { speakText, triggerHaptic, getPhoneticInfo } from '../utils/speech';
 
 interface FlashcardViewProps {
   words: WordItem[];
@@ -254,13 +254,17 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             </div>
 
             {/* 單字主體區 */}
-            <div className="text-center my-auto space-y-2">
-              <div className="inline-block">
-                <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-md mr-1.5">
+            <div className="text-center my-auto space-y-2.5">
+              <div className="inline-flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1 rounded-full border border-slate-200/60">
+                <span className="text-[11px] font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded shadow-2xs">
                   {currentWord?.partOfSpeech}
                 </span>
-                <span className="text-xs text-slate-400 font-mono tracking-wide">
-                  {currentWord?.phonetic}
+                <span className="text-[11px] font-bold text-slate-600 flex items-center gap-0.5">
+                  <span>{currentWord ? getPhoneticInfo(currentWord, settings.speechLang).flag : '🇺🇸'}</span>
+                  <span>{currentWord ? getPhoneticInfo(currentWord, settings.speechLang).label : 'US'}</span>
+                </span>
+                <span className="text-xs text-slate-700 font-mono tracking-wide">
+                  {currentWord ? getPhoneticInfo(currentWord, settings.speechLang).phonetic : ''}
                 </span>
               </div>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight break-words px-2">
@@ -306,6 +310,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               <h3 className="text-2xl font-black text-amber-300 mt-2">
                 {currentWord?.translation}
               </h3>
+              {currentWord?.phoneticUk && (
+                <div className="flex items-center gap-2 mt-1 text-[11px] font-mono">
+                  <span className="text-slate-400">🇺🇸 {currentWord.phonetic}</span>
+                  <span className="text-white/20">•</span>
+                  <span className="text-sky-300">🇬🇧/🇦🇺 {currentWord.phoneticUk}</span>
+                </div>
+              )}
             </div>
 
             {/* 例句區塊 */}

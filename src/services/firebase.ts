@@ -5,11 +5,21 @@ import type { Auth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 
-// 優先讀取環境變數，若無則檢查本機動態配置
+// 預設專案配置 (使用者提供)
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyD9Ut9Gq_qXnzlLag261Acx2xR8EZ2-ubk",
+  authDomain: "voyage-vocab.firebaseapp.com",
+  projectId: "voyage-vocab",
+  storageBucket: "voyage-vocab.firebasestorage.app",
+  messagingSenderId: "852823535541",
+  appId: "1:852823535541:web:2703790ac2d7f0c12433fc",
+  measurementId: "G-G2M5N9R110"
+};
+
 const getFirebaseConfig = () => {
   const env = import.meta.env;
   
-  // 檢查是否有透過 Vite 注入的環境變數
+  // 優先檢查是否有透過 Vite 注入的環境變數
   if (env.VITE_FIREBASE_API_KEY && env.VITE_FIREBASE_PROJECT_ID) {
     return {
       apiKey: env.VITE_FIREBASE_API_KEY,
@@ -21,7 +31,7 @@ const getFirebaseConfig = () => {
     };
   }
 
-  // 支援使用者在 App 設定中直接貼上 Firebase 配置物件
+  // 支援使用者在 App 設定中覆蓋自訂配置
   try {
     const customConfig = localStorage.getItem('voyage_firebase_custom_config');
     if (customConfig) {
@@ -31,7 +41,7 @@ const getFirebaseConfig = () => {
     // ignore
   }
 
-  return null;
+  return DEFAULT_FIREBASE_CONFIG;
 };
 
 let app: FirebaseApp | null = null;

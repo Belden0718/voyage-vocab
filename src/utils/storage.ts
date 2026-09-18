@@ -13,6 +13,7 @@ export interface AppSettings {
   speechLang: string;
   hapticEnabled: boolean;
   autoSpeak: boolean;
+  enableListeningQuiz: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -20,6 +21,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   speechLang: 'en-US',
   hapticEnabled: true,
   autoSpeak: true,
+  enableListeningQuiz: true,
 };
 
 // 取得全部單字 (內建 + 使用者自訂)

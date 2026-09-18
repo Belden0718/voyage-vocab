@@ -325,6 +325,7 @@ export const App: React.FC = () => {
               settings={settings}
               onRecordResult={handleQuizResult}
               onQuizComplete={handleQuizComplete}
+              onUpdateSettings={handleUpdateSettings}
             />
           )}
 

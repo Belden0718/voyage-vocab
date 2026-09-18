@@ -303,6 +303,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               className="w-4 h-4 accent-indigo-600 rounded cursor-pointer"
             />
           </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <div>
+              <span className="text-xs font-medium text-slate-700 block">測驗題包含聽力聽辨題</span>
+              <span className="text-[11px] text-slate-400">關閉後測驗將轉為全文字刷題模式</span>
+            </div>
+            <input
+              type="checkbox"
+              checked={settings.enableListeningQuiz ?? true}
+              onChange={(e) => onUpdateSettings({ enableListeningQuiz: e.target.checked })}
+              className="w-4 h-4 accent-indigo-600 rounded cursor-pointer"
+            />
+          </div>
         </div>
 
         <hr className="border-slate-100" />

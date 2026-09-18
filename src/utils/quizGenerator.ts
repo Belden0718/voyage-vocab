@@ -13,7 +13,8 @@ const shuffle = <T>(array: T[]): T[] => {
 export const generateQuizSet = (
   allWords: WordItem[],
   count: number = 10,
-  categoryFilter?: string
+  categoryFilter?: string,
+  includeListening: boolean = true
 ): QuizQuestion[] => {
   const targetWords = categoryFilter && categoryFilter !== 'all'
     ? allWords.filter(w => w.category === categoryFilter)
@@ -23,11 +24,15 @@ export const generateQuizSet = (
   const selected = shuffle(pool).slice(0, Math.min(count, pool.length));
 
   return selected.map((word, index) => {
-    // 隨機決定題型: 0=英選中, 1=中選英, 2=聽力題
-    const typeRoll = index % 3;
+    // 隨機決定題型: 若關閉聽力，只在英選中(0)與中選英(1)之間輪替
+    const typeRoll = includeListening ? (index % 3) : (index % 2);
     let type: QuizQuestion['type'] = 'meaning';
-    if (typeRoll === 1) type = 'fillInBlank';
-    if (typeRoll === 2) type = 'listening';
+    if (includeListening) {
+      if (typeRoll === 1) type = 'fillInBlank';
+      if (typeRoll === 2) type = 'listening';
+    } else {
+      if (typeRoll === 1) type = 'fillInBlank';
+    }
 
     // 取得 3 個干擾選項
     const others = allWords.filter(w => w.id !== word.id);

@@ -7,7 +7,7 @@ import { calculateLevelInfo } from '../utils/gamification';
 import confetti from 'canvas-confetti';
 import { 
   Trophy, Volume2, CheckCircle2, XCircle, RotateCcw, ArrowRight, 
-  Headphones, Sparkles, Award, Zap
+  Headphones, Sparkles, Award, Zap, VolumeX, SkipForward
 } from 'lucide-react';
 
 interface QuizResultSummary {
@@ -21,14 +21,17 @@ interface QuizViewProps {
   settings: AppSettings;
   onRecordResult: (wordId: string, isCorrect: boolean) => void;
   onQuizComplete?: (score: number, total: number) => QuizResultSummary;
+  onUpdateSettings?: (settings: Partial<AppSettings>) => void;
 }
 
 export const QuizView: React.FC<QuizViewProps> = ({ 
   words, 
   settings, 
   onRecordResult,
-  onQuizComplete 
+  onQuizComplete,
+  onUpdateSettings
 }) => {
+  const [enableListening, setEnableListening] = useState<boolean>(settings.enableListeningQuiz ?? true);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -43,10 +46,11 @@ export const QuizView: React.FC<QuizViewProps> = ({
   wordsRef.current = words;
 
   // 初始化測驗題目 (固定抽取 8 題)
-  const startNewQuiz = (sourceWords?: WordItem[]) => {
+  const startNewQuiz = (sourceWords?: WordItem[], listeningMode?: boolean) => {
     const listToUse = sourceWords || wordsRef.current;
     if (listToUse.length < 4) return;
-    const qList = generateQuizSet(listToUse, 8);
+    const useListening = listeningMode !== undefined ? listeningMode : enableListening;
+    const qList = generateQuizSet(listToUse, 8, undefined, useListening);
     setQuestions(qList);
     setCurrentIndex(0);
     setSelectedOption(null);
@@ -55,6 +59,76 @@ export const QuizView: React.FC<QuizViewProps> = ({
     setIsFinished(false);
     setWrongAnswers([]);
     setQuizResult(null);
+  };
+
+  // 切換全域聽力題開關 (靜音刷題模式)
+  const toggleListeningMode = () => {
+    const nextMode = !enableListening;
+    setEnableListening(nextMode);
+    triggerHaptic('light');
+    onUpdateSettings?.({ enableListeningQuiz: nextMode });
+
+    // 若切換為關閉且當前題目剛好是未作答的聽力題，自動就地轉為文字題
+    if (!nextMode && currentQ?.type === 'listening' && !isAnswered) {
+      handleConvertToTextQuestion();
+    }
+  };
+
+  // 將當前聽力題轉換為英選中文字題 (不必聽發音直接做題)
+  const handleConvertToTextQuestion = () => {
+    if (isAnswered || !currentQ) return;
+    triggerHaptic('light');
+
+    const others = words.filter(w => w.id !== currentQ.word.id);
+    const distractorCandidates = [...others].sort(() => 0.5 - Math.random()).slice(0, 3);
+    const correctAnswer = currentQ.word.translation;
+    const options = [correctAnswer, ...distractorCandidates.map(d => d.translation)].sort(() => 0.5 - Math.random());
+
+    const updatedQ: QuizQuestion = {
+      ...currentQ,
+      type: 'meaning',
+      prompt: `請問「${currentQ.word.word}」的意思是？`,
+      correctAnswer,
+      options,
+    };
+
+    setQuestions(prev => {
+      const next = [...prev];
+      next[currentIndex] = updatedQ;
+      return next;
+    });
+  };
+
+  // 略過此聽力題 (不計錯題，抽一題文字題替補)
+  const handleSkipQuestion = () => {
+    if (isAnswered || !currentQ) return;
+    triggerHaptic('light');
+
+    const existingIds = new Set(questions.map(q => q.word.id));
+    const availableWords = words.filter(w => !existingIds.has(w.id));
+    const pool = availableWords.length > 0 ? availableWords : words.filter(w => w.id !== currentQ.word.id);
+    
+    if (pool.length > 0) {
+      const fallbackWord = pool[Math.floor(Math.random() * pool.length)];
+      const others = words.filter(w => w.id !== fallbackWord.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+      const replacementQ: QuizQuestion = {
+        id: `q-sub-${fallbackWord.id}-${Date.now()}`,
+        type: 'meaning',
+        word: fallbackWord,
+        prompt: `請問「${fallbackWord.word}」的意思是？`,
+        correctAnswer: fallbackWord.translation,
+        options: [fallbackWord.translation, ...others.map(o => o.translation)].sort(() => 0.5 - Math.random()),
+        explanation: `${fallbackWord.word} (${fallbackWord.phonetic}) [${fallbackWord.partOfSpeech}] : ${fallbackWord.translation}\n例句: ${fallbackWord.example}\n翻譯: ${fallbackWord.exampleTranslation}`,
+      };
+
+      setQuestions(prev => {
+        const next = [...prev];
+        next[currentIndex] = replacementQ;
+        return next;
+      });
+    } else {
+      handleConvertToTextQuestion();
+    }
   };
 
   // 僅在初次載入且尚無題目時初始化，嚴禁因父組件 re-render 而洗掉作答進度
@@ -266,8 +340,30 @@ export const QuizView: React.FC<QuizViewProps> = ({
             題目 {currentIndex + 1} / {questions.length}
           </span>
           <div className="flex items-center gap-2">
-            <span className="text-slate-400 font-normal text-[11px]">答對率</span>
-            <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-black">
+            {/* 聽力題快速開關 (靜音刷題模式) */}
+            <button
+              onClick={toggleListeningMode}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border shrink-0 ${
+                enableListening
+                  ? 'bg-indigo-50 text-indigo-700 border-indigo-200/80 hover:bg-indigo-100'
+                  : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+              }`}
+              title={enableListening ? '目前含聽力題，點擊切換為純文字刷題模式' : '目前為純文字刷題，點擊開啟聽力題'}
+            >
+              {enableListening ? (
+                <>
+                  <Headphones className="w-3 h-3 text-indigo-600" />
+                  <span>聽力題: 開</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-3 h-3 text-amber-600" />
+                  <span>純文字刷題</span>
+                </>
+              )}
+            </button>
+
+            <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-black text-[11px]">
               得分: {score}
             </span>
           </div>
@@ -293,18 +389,63 @@ export const QuizView: React.FC<QuizViewProps> = ({
         <div className="text-center py-2 space-y-3">
           <h3 className="text-sm font-semibold text-slate-500">{currentQ.prompt}</h3>
 
-          {/* 聽力題播放按鈕 */}
+          {/* 聽力題發音與跳過/轉文字題操作區 */}
           {currentQ.type === 'listening' && (
-            <button
-              onClick={() => {
-                triggerHaptic('light');
-                speakText(currentQ.word.word, settings.speechRate, settings.speechLang);
-              }}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-sm shadow-sm active:scale-95 transition-all mx-auto"
-            >
-              <Headphones className="w-5 h-5 text-indigo-600" />
-              點擊播放英語發音
-            </button>
+            <div className="space-y-2.5">
+              {!isAnswered ? (
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      triggerHaptic('light');
+                      speakText(currentQ.word.word, settings.speechRate, settings.speechLang);
+                    }}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-sm shadow-sm active:scale-95 transition-all mx-auto border border-indigo-100/80"
+                  >
+                    <Headphones className="w-5 h-5 text-indigo-600 animate-pulse" />
+                    點擊播放英語發音
+                  </button>
+
+                  <div className="flex items-center justify-center gap-2 pt-0.5">
+                    <button
+                      onClick={handleConvertToTextQuestion}
+                      className="text-xs text-slate-600 hover:text-indigo-600 font-semibold px-3 py-1.5 rounded-xl bg-slate-100/90 hover:bg-indigo-50 transition-all flex items-center gap-1 active:scale-95"
+                      title="不方便開聲音時，直接將此題轉為英選中文字題"
+                    >
+                      <VolumeX className="w-3.5 h-3.5 text-slate-500" />
+                      <span>不便聽語音？轉文字題</span>
+                    </button>
+                    <button
+                      onClick={handleSkipQuestion}
+                      className="text-xs text-slate-400 hover:text-slate-600 font-medium px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-all flex items-center gap-1 active:scale-95"
+                      title="跳過此聽力題並抽一題文字題替補"
+                    >
+                      <SkipForward className="w-3.5 h-3.5" />
+                      <span>跳過此題</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* 答題後：揭曉大字英文單字與清晰中文釋義！ */
+                <div className="p-3.5 bg-indigo-50/60 rounded-2xl border border-indigo-100 space-y-1.5 animate-fade-in">
+                  <div className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight">
+                    {currentQ.word.word}
+                  </div>
+                  <div className="text-lg sm:text-xl font-black text-slate-800">
+                    「{currentQ.word.translation}」
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-mono">
+                    <span>{settings.speechLang === 'en-US' ? currentQ.word.phonetic : (currentQ.word.phoneticUk || currentQ.word.phonetic)}</span>
+                    <button
+                      onClick={() => speakText(currentQ.word.word, settings.speechRate, settings.speechLang)}
+                      className="p-1 rounded-md text-indigo-600 hover:bg-indigo-100 active:scale-90 transition-all"
+                      title="重新發音"
+                    >
+                      <Volume2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* 英選中時：顯示超大英文單字 */}
@@ -423,17 +564,20 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
             {/* 單字詳解卡片 */}
             <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs space-y-2">
-              <div className="flex items-center justify-between font-bold text-slate-800">
-                <span className="flex items-center gap-2">
-                  <span className="text-indigo-600 font-black text-sm">{currentQ.word.word}</span>
+              <div className="flex items-center justify-between font-bold text-slate-800 flex-wrap gap-2 pb-1.5 border-b border-slate-200/50">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-indigo-600 font-black text-base">{currentQ.word.word}</span>
                   <span className="text-slate-400 font-mono text-[11px]">
                     {settings.speechLang === 'en-US' ? currentQ.word.phonetic : (currentQ.word.phoneticUk || currentQ.word.phonetic)}
                   </span>
-                  <span className="text-slate-500 font-normal">[{currentQ.word.partOfSpeech}]</span>
-                </span>
+                  <span className="text-slate-500 text-xs font-normal">[{currentQ.word.partOfSpeech}]</span>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                    {currentQ.word.translation}
+                  </span>
+                </div>
                 <button
                   onClick={() => speakText(currentQ.word.example, settings.speechRate, settings.speechLang)}
-                  className="flex items-center text-indigo-600 gap-1 hover:underline font-bold"
+                  className="flex items-center text-indigo-600 gap-1 hover:underline font-bold text-xs shrink-0"
                 >
                   <Volume2 className="w-3.5 h-3.5" /> 聽例句
                 </button>

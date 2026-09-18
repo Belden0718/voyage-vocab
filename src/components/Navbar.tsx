@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Settings, Compass, Cloud, CloudCheck } from 'lucide-react';
+import { Flame, Settings, Cloud, CloudCheck } from 'lucide-react';
 import type { UserStats } from '../types';
 import type { User } from 'firebase/auth';
 
@@ -19,10 +19,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 px-4 py-3 transition-colors">
       <div className="max-w-md mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-            <Compass className="w-5 h-5 animate-pulse-subtle" />
-          </div>
+        <div className="flex items-center space-x-2.5">
+          <img 
+            src="/apple-touch-icon.png" 
+            alt="VoyageVocab Logo" 
+            className="w-9 h-9 rounded-xl shadow-md shadow-indigo-200/50 object-cover border border-slate-100/80" 
+          />
           <div>
             <h1 className="font-bold text-slate-800 text-base leading-tight tracking-tight">
               隨行英文 <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full ml-1">旅遊 & 生活</span>

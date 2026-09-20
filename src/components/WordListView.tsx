@@ -282,9 +282,15 @@ export const WordListView: React.FC<WordListViewProps> = ({
                     <Volume2 className="w-5 h-5" />
                   </button>
 
-                  <div className="min-w-0">
+                  <div 
+                    className={`min-w-0 ${isCustom ? 'cursor-pointer group' : ''}`}
+                    onClick={isCustom ? (e) => handleOpenEditModal(item, e) : undefined}
+                    title={isCustom ? '點擊直接編輯此生詞' : undefined}
+                  >
                     <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
-                      <span className="font-bold text-sm text-slate-800 break-words">{item.word}</span>
+                      <span className={`font-bold text-sm text-slate-800 break-words ${isCustom ? 'group-hover:text-indigo-600 transition-colors' : ''}`}>
+                        {item.word}
+                      </span>
                       <span className="text-[10px] font-mono text-slate-500 bg-slate-50 px-1.5 py-0.2 rounded border border-slate-100 flex items-center gap-1">
                         <CountryFlag code={getPhoneticInfo(item, settings.speechLang).countryCode} className="w-3 h-2 inline-block rounded-[1px] shadow-2xs border border-slate-200/60 shrink-0" />
                         <span>{getPhoneticInfo(item, settings.speechLang).phonetic}</span>
@@ -293,8 +299,9 @@ export const WordListView: React.FC<WordListViewProps> = ({
                         {item.partOfSpeech}
                       </span>
                       {isCustom && (
-                        <span className="text-[9px] font-bold text-purple-600 bg-purple-50 border border-purple-200/70 px-1.5 py-0.2 rounded">
-                          自訂
+                        <span className="text-[9px] font-bold text-purple-600 bg-purple-50 border border-purple-200/70 px-1.5 py-0.2 rounded flex items-center gap-0.5">
+                          <span>自訂</span>
+                          <span className="text-[8px] text-purple-400">(點擊可編輯)</span>
                         </span>
                       )}
                     </div>
@@ -319,7 +326,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
                     <>
                       <button
                         onClick={(e) => handleOpenEditModal(item, e)}
-                        className="p-1.5 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                        className="p-1.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 active:scale-95 transition-all shadow-2xs"
                         title="編輯此生詞"
                         aria-label="編輯此生詞"
                       >
@@ -327,7 +334,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
                       </button>
                       <button
                         onClick={(e) => handleDeleteWord(item, e)}
-                        className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                        className="p-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 active:scale-95 transition-all shadow-2xs"
                         title="刪除此生詞"
                         aria-label="刪除此生詞"
                       >

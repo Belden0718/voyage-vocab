@@ -125,6 +125,13 @@ const BASIC_COMMON_WORDS: Record<string, { pos: string; trans: string; phonetic?
   'already': { pos: 'adv.', trans: '已經', phonetic: '/ɔ:lˈredi/' },
   'always': { pos: 'adv.', trans: '總是、一直', phonetic: '/ˈɔ:lweɪz/' },
   'never': { pos: 'adv.', trans: '從不、絕不', phonetic: '/ˈnevər/' },
+  'if': { pos: 'conj.', trans: '如果、假使；是否', phonetic: '/ɪf/' },
+  'because': { pos: 'conj.', trans: '因為', phonetic: '/bɪˈkɔːz/' },
+  'all': { pos: 'adj./pron.', trans: '所有的、全部的', phonetic: '/ɔːl/' },
+  'some': { pos: 'adj./pron.', trans: '一些、某些', phonetic: '/sʌm/' },
+  'one': { pos: 'num./pron.', trans: '一個、一', phonetic: '/wʌn/' },
+  'same': { pos: 'adj.', trans: '相同的、同樣的', phonetic: '/seɪm/' },
+  'tonight': { pos: 'n./adv.', trans: '今晚', phonetic: '/təˈnaɪt/' },
 
   // 代名詞
   'i': { pos: 'pron.', trans: '我 (主格)', phonetic: '/aɪ/' },
@@ -176,6 +183,10 @@ const BASIC_COMMON_WORDS: Record<string, { pos: string; trans: string; phonetic?
   'up': { pos: 'adv./prep.', trans: '向上、起來', phonetic: '/ʌp/' },
   'down': { pos: 'adv./prep.', trans: '向下、落下', phonetic: '/daʊn/' },
   'off': { pos: 'adv./prep.', trans: '離開、脫下、關掉', phonetic: '/ɔ:f/' },
+  'over': { pos: 'prep.', trans: '在...上方、越過、超過', phonetic: '/ˈoʊvər/' },
+  'until': { pos: 'prep./conj.', trans: '直到...為止', phonetic: '/ənˈtɪl/' },
+  'after': { pos: 'prep./conj.', trans: '在...之後', phonetic: '/ˈæftər/' },
+  'near': { pos: 'prep./adj.', trans: '在...附近、靠近', phonetic: '/nɪr/' },
 
   // 動詞 (be、助動詞與常用動詞)
   'is': { pos: 'v.', trans: '是 (be動詞單數現在式)', phonetic: '/ɪz/' },
@@ -297,6 +308,23 @@ const BASIC_COMMON_WORDS: Record<string, { pos: string; trans: string; phonetic?
   'small': { pos: 'adj.', trans: '小的', phonetic: '/smɔ:l/' },
   'fast': { pos: 'adj./adv.', trans: '快速的', phonetic: '/fæst/' },
   'slow': { pos: 'adj./adv.', trans: '緩慢的', phonetic: '/sloʊ/' },
+  'late': { pos: 'adj./adv.', trans: '遲的、晚的、延後的', phonetic: '/leɪt/' },
+  'fresh': { pos: 'adj.', trans: '新鮮的、嶄新的', phonetic: '/freʃ/' },
+  'full': { pos: 'adj.', trans: '完整的、全額的、滿的', phonetic: '/fʊl/' },
+  'rough': { pos: 'adj.', trans: '洶湧的、風浪大的、粗糙的', phonetic: '/rʌf/' },
+  'dead': { pos: 'adj.', trans: '沒電的、耗盡的、死亡的', phonetic: '/ded/' },
+  'family': { pos: 'n.', trans: '家庭、家人', phonetic: '/ˈfæməli/' },
+  'hair': { pos: 'n.', trans: '頭髮、毛髮', phonetic: '/her/' },
+  'dryer': { pos: 'n.', trans: '吹風機、烘乾機', phonetic: '/ˈdraɪər/' },
+  'hall': { pos: 'n.', trans: '大廳、走廊、會堂', phonetic: '/hɔːl/' },
+  'market': { pos: 'n.', trans: '市場、市集', phonetic: '/ˈmɑːrkɪt/' },
+  'phone': { pos: 'n.', trans: '電話、手機', phonetic: '/foʊn/' },
+  'show': { pos: 'v./n.', trans: '出示、展示；表演', phonetic: '/ʃoʊ/' },
+  'die': { pos: 'v.', trans: '關機、停擺、死亡', phonetic: '/daɪ/' },
+  'died': { pos: 'v.', trans: '沒電關機、停擺 (過去式)', phonetic: '/daɪd/' },
+  'run': { pos: 'v.', trans: '進行、運作、跑', phonetic: '/rʌn/' },
+  'runs': { pos: 'v.', trans: '進行、營業 (第三人稱單數)', phonetic: '/rʌnz/' },
+  'pm': { pos: 'abbr.', trans: '下午、午後 (post meridiem)', phonetic: '/ˌpiː ˈem/' },
 };
 
 interface LookupResult {

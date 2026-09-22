@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import type { WordItem } from '../types';
 import { speakText, triggerHaptic } from '../utils/speech';
 import { saveCustomWord } from '../utils/storage';
+import { SENTENCE_DICTIONARY } from '../data/sentenceDictionary';
 import { Volume2, ExternalLink, X, BookOpen, Plus, Check } from 'lucide-react';
 
 interface InteractiveSentenceProps {
@@ -337,11 +338,26 @@ interface LookupResult {
   source: 'phrasal' | 'vocab' | 'common' | 'online';
 }
 
+// 常見不規則動詞過去式與分詞還原表
+const IRREGULAR_VERBS_MAP: Record<string, string> = {
+  'bought': 'buy', 'took': 'take', 'left': 'leave', 'spent': 'spend', 'saw': 'see',
+  'went': 'go', 'came': 'come', 'made': 'make', 'got': 'get', 'flew': 'fly',
+  'held': 'hold', 'chose': 'choose', 'felt': 'feel', 'found': 'find', 'swam': 'swim',
+  'drove': 'drive', 'wore': 'wear', 'ate': 'eat', 'drank': 'drink', 'slept': 'sleep',
+  'caught': 'catch', 'thought': 'think', 'brought': 'bring', 'taught': 'teach',
+  'paid': 'pay', 'told': 'tell', 'sold': 'sell', 'built': 'build', 'lost': 'lose',
+  'won': 'win', 'spoken': 'speak', 'written': 'write', 'eaten': 'eat', 'flown': 'fly',
+  'driven': 'drive', 'chosen': 'choose', 'taken': 'take', 'given': 'give', 'gave': 'give',
+  'began': 'begin', 'begun': 'begin', 'broke': 'break', 'broken': 'break', 'stole': 'steal',
+  'stolen': 'steal', 'woken': 'wake', 'woke': 'wake', 'fell': 'fall', 'fallen': 'fall',
+  'stood': 'stand', 'understood': 'understand', 'sat': 'sit', 'met': 'meet', 'led': 'lead'
+};
+
 // 單字獨立精確查詞
 const lookupSingleWord = (clean: string, pool: WordItem[]): LookupResult => {
   if (!clean) return { word: clean, translation: '', source: 'online' };
 
-  // 1. 本機 310 核心詞庫精確匹配
+  // 1. 本機核心詞庫精確匹配
   const exact = pool.find(w => w.word.toLowerCase() === clean);
   if (exact) {
     return {
@@ -366,30 +382,98 @@ const lookupSingleWord = (clean: string, pool: WordItem[]): LookupResult => {
     };
   }
 
-  // 3. 詞形變化還原 (單複數 -s/-es, 過去式 -ed, 進行式 -ing)
-  let stemMatch: WordItem | undefined;
-  if (clean.endsWith('es')) {
-    stemMatch = pool.find(w => w.word.toLowerCase() === clean.slice(0, -2));
-  } else if (clean.endsWith('s')) {
-    stemMatch = pool.find(w => w.word.toLowerCase() === clean.slice(0, -1));
-  } else if (clean.endsWith('ed')) {
-    stemMatch = pool.find(w => w.word.toLowerCase() === clean.slice(0, -2) || w.word.toLowerCase() === clean.slice(0, -1));
-  } else if (clean.endsWith('ing')) {
-    stemMatch = pool.find(w => w.word.toLowerCase() === clean.slice(0, -3) || w.word.toLowerCase() === clean.slice(0, -3) + 'e');
-  }
-
-  if (stemMatch) {
+  // 3. 例句全詞庫擴充字典 (覆蓋全站 310+ 生詞例句中所有單詞)
+  const dictEntry = SENTENCE_DICTIONARY[clean];
+  if (dictEntry) {
     return {
       word: clean,
-      phonetic: stemMatch.phonetic,
-      partOfSpeech: stemMatch.partOfSpeech,
-      translation: `${stemMatch.translation} (${stemMatch.word} 的變化型)`,
-      tip: stemMatch.tip,
-      source: 'vocab',
+      phonetic: dictEntry.phonetic,
+      partOfSpeech: dictEntry.pos,
+      translation: dictEntry.trans,
+      source: 'common',
     };
   }
 
-  // 4. 線上辭典
+  // 4. 不規則動詞還原 (如 left -> leave, bought -> buy, took -> take)
+  if (IRREGULAR_VERBS_MAP[clean]) {
+    const baseWord = IRREGULAR_VERBS_MAP[clean];
+    const baseExact = pool.find(w => w.word.toLowerCase() === baseWord);
+    if (baseExact) {
+      return {
+        word: clean,
+        baseWord,
+        phonetic: baseExact.phonetic,
+        partOfSpeech: 'v.',
+        translation: `${baseExact.translation} (${baseWord} 的過去式/分詞)`,
+        tip: baseExact.tip,
+        source: 'vocab',
+      };
+    }
+    const baseBasic = BASIC_COMMON_WORDS[baseWord];
+    if (baseBasic) {
+      return {
+        word: clean,
+        baseWord,
+        phonetic: baseBasic.phonetic,
+        partOfSpeech: 'v.',
+        translation: `${baseBasic.trans} (${baseWord} 的過去式/分詞)`,
+        source: 'common',
+      };
+    }
+    const baseDict = SENTENCE_DICTIONARY[baseWord];
+    if (baseDict) {
+      return {
+        word: clean,
+        baseWord,
+        phonetic: baseDict.phonetic,
+        partOfSpeech: 'v.',
+        translation: `${baseDict.trans} (${baseWord} 的過去式/分詞)`,
+        source: 'common',
+      };
+    }
+  }
+
+  // 5. 詞形變化還原 (單複數 -s/-es, 過去式 -ed, 進行式 -ing)
+  const findCandidate = (stem: string) => {
+    const ex = pool.find(w => w.word.toLowerCase() === stem);
+    if (ex) {
+      return { word: ex.word, translation: ex.translation, partOfSpeech: ex.partOfSpeech, phonetic: ex.phonetic, tip: ex.tip };
+    }
+    const b = BASIC_COMMON_WORDS[stem];
+    if (b) {
+      return { word: stem, translation: b.trans, partOfSpeech: b.pos, phonetic: b.phonetic };
+    }
+    const d = SENTENCE_DICTIONARY[stem];
+    if (d) {
+      return { word: stem, translation: d.trans, partOfSpeech: d.pos, phonetic: d.phonetic };
+    }
+    return null;
+  };
+
+  let stemObj: { word: string; translation: string; partOfSpeech?: string; phonetic?: string; tip?: string } | null = null;
+  if (clean.endsWith('es')) {
+    stemObj = findCandidate(clean.slice(0, -2));
+  } else if (clean.endsWith('s')) {
+    stemObj = findCandidate(clean.slice(0, -1));
+  } else if (clean.endsWith('ed')) {
+    stemObj = findCandidate(clean.slice(0, -2)) || findCandidate(clean.slice(0, -1));
+  } else if (clean.endsWith('ing')) {
+    stemObj = findCandidate(clean.slice(0, -3)) || findCandidate(clean.slice(0, -3) + 'e');
+  }
+
+  if (stemObj) {
+    return {
+      word: clean,
+      baseWord: stemObj.word,
+      phonetic: stemObj.phonetic,
+      partOfSpeech: stemObj.partOfSpeech,
+      translation: `${stemObj.translation} (${stemObj.word} 的變化型)`,
+      tip: stemObj.tip,
+      source: 'common',
+    };
+  }
+
+  // 6. 線上辭典
   return {
     word: clean,
     translation: '',

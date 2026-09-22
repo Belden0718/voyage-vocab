@@ -337,6 +337,7 @@ export const App: React.FC = () => {
               initialCategory={selectedCategory}
               onReviewWord={handleReviewWord}
               onToggleStar={handleToggleStar}
+              onChangeTab={setActiveTab}
             />
           )}
 
